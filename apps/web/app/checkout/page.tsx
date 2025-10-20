@@ -1,23 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tag, Lock, Check } from 'lucide-react';
 import Link from 'next/link';
+import { loadStripe } from '@stripe/stripe-js';
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_KEY');
 
 export default function CheckoutPage() {
   const [email, setEmail] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
-    // TODO: Integrate with Stripe Checkout
-    // For now, simulate processing
-    setTimeout(() => {
-      alert('Stripe integration coming soon! Email: ' + email);
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      } else {
+        alert(data.error || 'Failed to start checkout');
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      alert('Network error - please try again');
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -79,50 +97,49 @@ export default function CheckoutPage() {
           {/* Right Column - Checkout Form */}
           <div>
             <h2 className="text-2xl font-bold mb-6">Complete Your Purchase</h2>
-            <form onSubmit={handleCheckout} className="bg-white rounded-lg shadow-sm p-6">
-              <div className="mb-6">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-depot-orange focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  You'll receive your login credentials here
-                </p>
-              </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Details
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Lock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 font-medium">Stripe Checkout Integration</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Secure payment form will appear here
+            {!clientSecret ? (
+              <form onSubmit={handleCheckout} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="mb-6">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-depot-orange focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    You'll receive your login credentials here
                   </p>
                 </div>
+
+                <button
+                  type="submit"
+                  disabled={isProcessing}
+                  className="w-full bg-depot-orange text-white py-4 rounded-lg font-semibold hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                >
+                  {isProcessing ? 'Loading checkout...' : 'Continue to Payment →'}
+                </button>
+
+                <p className="text-xs text-gray-500 text-center mt-4">
+                  By continuing, you agree to our Terms of Service and Privacy Policy
+                </p>
+              </form>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <EmbeddedCheckoutProvider
+                  stripe={stripePromise}
+                  options={{ clientSecret }}
+                >
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
               </div>
-
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="w-full bg-depot-orange text-white py-4 rounded-lg font-semibold hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-              >
-                {isProcessing ? 'Processing...' : 'Pay $29 - Get Lifetime Access'}
-              </button>
-
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By completing this purchase, you agree to our Terms of Service and Privacy Policy
-              </p>
-            </form>
+            )}
 
             <div className="mt-6 text-center">
               <Link href="/search" className="text-depot-orange hover:underline text-sm">
