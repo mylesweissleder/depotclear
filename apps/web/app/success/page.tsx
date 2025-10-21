@@ -129,7 +129,7 @@ function SuccessContent() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Amount Paid:</span>
-                  <span className="font-medium">$29.00</span>
+                  <span className="font-medium">$20.00</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Email:</span>
