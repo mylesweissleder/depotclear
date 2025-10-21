@@ -105,19 +105,13 @@ function SuccessContent() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex justify-center">
               <Link
                 href="/search"
-                className="flex-1 bg-depot-orange text-white text-center px-6 py-4 rounded-lg font-semibold hover:bg-orange-600 transition"
+                className="bg-depot-orange text-white text-center px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition"
               >
                 Start Finding Deals →
               </Link>
-              <a
-                href="mailto:support@depotclear.com"
-                className="flex-1 bg-gray-100 text-gray-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-gray-200 transition"
-              >
-                Contact Support
-              </a>
             </div>
 
             <div className="mt-8 pt-8 border-t border-gray-200">
