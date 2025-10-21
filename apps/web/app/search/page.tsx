@@ -212,16 +212,50 @@ export default function SearchPage() {
           )}
         </div>
 
+        {/* Local Store Info */}
+        <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-3">
+            <MapPin className="w-6 h-6" />
+            <div>
+              <h3 className="font-bold">Your Local Stores ({zipCode})</h3>
+              <p className="text-sm text-green-100">3 Home Depot locations within 10 miles</p>
+            </div>
+          </div>
+        </div>
+
         {/* Results Summary */}
         <div className="bg-gradient-to-r from-depot-orange to-orange-500 text-white rounded-lg p-6 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex-1">
               <h2 className="text-2xl font-bold mb-1">{filteredProducts.length} Clearance Items Found</h2>
-              <p className="text-orange-100">Near {zipCode} • Updated 2 hours ago</p>
+              <p className="text-orange-100">Updated 2 hours ago • Penny deal indicators shown</p>
             </div>
-            <div className="mt-4 md:mt-0 text-center md:text-right">
-              <div className="text-3xl font-bold">${savings.toFixed(2)}</div>
-              <div className="text-orange-100">Total Potential Savings</div>
+            <div className="flex gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold">{filteredProducts.filter(p => p.price <= 1).length}</div>
+                <div className="text-orange-100 text-sm">Penny Items</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">${savings.toFixed(0)}</div>
+                <div className="text-orange-100 text-sm">Potential Savings</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-orange-400/30">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-300">💡</span>
+                <span>Prices ending in .02/.03/.04/.06 = penny deal potential</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-300">🔥</span>
+                <span>Scan items in-store for further markdowns</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-300">⏰</span>
+                <span>Best times: Early morning or seasonal transitions</span>
+              </div>
             </div>
           </div>
         </div>
@@ -254,23 +288,68 @@ export default function SearchPage() {
 function ProductCard({ product }: { product: typeof mockProducts[0] }) {
   const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 
+  // Determine markdown level based on price ending
+  const priceStr = product.price.toFixed(2);
+  const cents = priceStr.split('.')[1];
+  const lastDigit = cents[1];
+
+  let markdownLevel = '';
+  let markdownBadgeColor = '';
+  let pennyDealPotential = '';
+
+  if (lastDigit === '0' && cents !== '00') {
+    markdownLevel = '25% OFF';
+    markdownBadgeColor = 'bg-blue-500';
+    pennyDealPotential = 'May drop to $X.06 in-store';
+  } else if (lastDigit === '2') {
+    markdownLevel = '90% OFF';
+    markdownBadgeColor = 'bg-purple-600';
+    pennyDealPotential = '🔥 Check for $0.02 penny deal!';
+  } else if (lastDigit === '3') {
+    markdownLevel = '75% OFF';
+    markdownBadgeColor = 'bg-indigo-600';
+    pennyDealPotential = 'May be $0.03 in-store!';
+  } else if (lastDigit === '4') {
+    markdownLevel = '50% OFF';
+    markdownBadgeColor = 'bg-teal-600';
+    pennyDealPotential = 'Could be $0.04 at your store';
+  } else if (lastDigit === '6') {
+    markdownLevel = '25% OFF';
+    markdownBadgeColor = 'bg-blue-500';
+    pennyDealPotential = 'Might find at $0.06';
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 border-transparent hover:border-depot-orange">
       <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
-        <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-          -{discount}%
-        </div>
+        {markdownLevel && (
+          <div className={`absolute top-2 left-2 ${markdownBadgeColor} text-white px-2 py-1 rounded text-xs font-bold shadow-lg`}>
+            {markdownLevel}
+          </div>
+        )}
+        {product.price <= 1 && (
+          <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+            PENNY!
+          </div>
+        )}
         <div className="text-gray-400 text-sm">Image Placeholder</div>
       </div>
       <div className="p-4">
         <div className="text-xs text-depot-orange font-semibold mb-1">{product.category}</div>
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.title}</h3>
-        <div className="text-xs text-gray-500 mb-3">Model: {product.modelNumber}</div>
 
-        <div className="flex items-baseline gap-2 mb-3">
+        <div className="flex items-baseline gap-2 mb-2">
           <span className="text-3xl font-bold text-depot-orange">${product.price.toFixed(2)}</span>
-          <span className="text-sm text-gray-500 line-through">${product.originalPrice.toFixed(2)}</span>
+          {product.originalPrice && (
+            <span className="text-sm text-gray-500 line-through">${product.originalPrice.toFixed(2)}</span>
+          )}
         </div>
+
+        {pennyDealPotential && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded px-2 py-1 mb-3">
+            <p className="text-xs text-yellow-800 font-medium">💡 {pennyDealPotential}</p>
+          </div>
+        )}
 
         <div className="flex items-center text-sm mb-3">
           <MapPin className="w-4 h-4 text-gray-400 mr-1" />
@@ -279,9 +358,12 @@ function ProductCard({ product }: { product: typeof mockProducts[0] }) {
 
         <div className="flex items-center justify-between mb-3">
           {product.inStock ? (
-            <span className="text-green-600 text-sm font-medium">✓ In Stock</span>
+            <span className="text-green-600 text-sm font-medium flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+              In Stock Nearby
+            </span>
           ) : (
-            <span className="text-red-600 text-sm font-medium">Out of Stock</span>
+            <span className="text-gray-500 text-sm">Check local stores</span>
           )}
         </div>
 
@@ -289,10 +371,10 @@ function ProductCard({ product }: { product: typeof mockProducts[0] }) {
           href={product.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full bg-depot-orange text-white text-center py-2 rounded-lg hover:bg-orange-600 transition font-medium"
+          className="block w-full bg-depot-orange text-white text-center py-2 rounded-lg hover:bg-orange-600 transition font-medium text-sm"
         >
           View on HomeDepot.com
-          <ExternalLink className="inline-block w-4 h-4 ml-1" />
+          <ExternalLink className="inline-block w-3 h-3 ml-1" />
         </a>
       </div>
     </div>
