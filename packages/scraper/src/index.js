@@ -14,13 +14,63 @@ class HomeDepotScraper {
 
   async initialize() {
     console.log('🚀 Initializing browser...');
-    this.browser = await chromium.launch({ headless: true });
+
+    // Launch with anti-detection settings
+    this.browser = await chromium.launch({
+      headless: false, // Use headed mode - looks more human
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process',
+      ],
+    });
+
     this.page = await this.browser.newPage();
+
+    // Set realistic viewport
+    await this.page.setViewportSize({ width: 1920, height: 1080 });
+
+    // Remove automation markers
+    await this.page.addInitScript(() => {
+      // Override the navigator.webdriver property
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+      });
+
+      // Mock plugins and mimeTypes
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => [1, 2, 3, 4, 5],
+      });
+
+      // Chrome runtime
+      window.chrome = {
+        runtime: {},
+      };
+
+      // Permissions
+      const originalQuery = window.navigator.permissions.query;
+      window.navigator.permissions.query = (parameters) =>
+        parameters.name === 'notifications'
+          ? Promise.resolve({ state: Notification.permission })
+          : originalQuery(parameters);
+    });
 
     // Set realistic headers
     await this.page.setExtraHTTPHeaders({
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
       'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Cache-Control': 'max-age=0',
     });
   }
 
@@ -35,15 +85,33 @@ class HomeDepotScraper {
     console.log(`   URL: ${searchUrl}`);
 
     try {
-      await this.page.goto(searchUrl, { waitUntil: 'networkidle', timeout: 30000 });
+      // Navigate with more realistic settings
+      await this.page.goto(searchUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
 
-      // Wait for product grid to load
-      await this.page.waitForSelector('[data-testid="product-pod"]', { timeout: 10000 });
+      // Random delay to appear more human
+      await this.randomDelay(2000, 4000);
+
+      // Try to wait for products, but continue if timeout
+      try {
+        await this.page.waitForSelector('[data-testid="product-pod"], .product-pod, .product', {
+          timeout: 15000,
+        });
+      } catch (e) {
+        console.log('      Product selector not found, checking page content...');
+      }
+
+      // Scroll to simulate human behavior
+      await this.humanScroll();
 
       const items = [];
 
       for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
         console.log(`   📄 Scraping page ${pageNum}...`);
+
+        await this.randomDelay(1000, 2000);
 
         const html = await this.page.content();
         const pageItems = this.parseProductPage(html, category);
@@ -58,7 +126,7 @@ class HomeDepotScraper {
             console.log('      No more pages available');
             break;
           }
-          await this.page.waitForTimeout(2000); // Be respectful
+          await this.randomDelay(3000, 5000); // Longer delay between pages
         }
       }
 
@@ -68,6 +136,36 @@ class HomeDepotScraper {
       console.error(`❌ Error scraping ${category}:`, error.message);
       return [];
     }
+  }
+
+  /**
+   * Random delay to appear more human
+   */
+  async randomDelay(min, max) {
+    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+    await this.page.waitForTimeout(delay);
+  }
+
+  /**
+   * Simulate human scrolling behavior
+   */
+  async humanScroll() {
+    await this.page.evaluate(async () => {
+      await new Promise((resolve) => {
+        let totalHeight = 0;
+        const distance = 100;
+        const timer = setInterval(() => {
+          const scrollHeight = document.body.scrollHeight;
+          window.scrollBy(0, distance);
+          totalHeight += distance;
+
+          if (totalHeight >= scrollHeight / 2) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, 100);
+      });
+    });
   }
 
   /**
