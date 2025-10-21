@@ -228,16 +228,20 @@ export default function SearchPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-1">{filteredProducts.length} Clearance Items Found</h2>
-              <p className="text-orange-100">Updated 2 hours ago • Penny deal indicators shown</p>
+              <p className="text-orange-100">Updated 2 hours ago • Markdown stages tracked</p>
             </div>
             <div className="flex gap-6">
               <div className="text-center">
                 <div className="text-3xl font-bold">{filteredProducts.filter(p => p.price <= 1).length}</div>
-                <div className="text-orange-100 text-sm">Penny Items</div>
+                <div className="text-orange-100 text-sm">Deep Discount</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">${savings.toFixed(0)}</div>
-                <div className="text-orange-100 text-sm">Potential Savings</div>
+                <div className="text-3xl font-bold">{filteredProducts.filter(p => {
+                  const cents = p.price.toFixed(2).split('.')[1];
+                  const lastDigit = cents[1];
+                  return ['2', '3', '4', '6'].includes(lastDigit);
+                }).length}</div>
+                <div className="text-orange-100 text-sm">Markdown Indicators</div>
               </div>
             </div>
           </div>
@@ -246,15 +250,15 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
               <div className="flex items-start gap-2">
                 <span className="text-yellow-300">💡</span>
-                <span>Prices ending in .02/.03/.04/.06 = penny deal potential</span>
+                <span>Price endings (.60→.06, .40→.04, etc.) indicate markdown stages</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-yellow-300">🔥</span>
-                <span>Scan items in-store for further markdowns</span>
+                <span>Always scan in-store - prices may be lower than online</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-yellow-300">⏰</span>
-                <span>Best times: Early morning or seasonal transitions</span>
+                <span>Penny deals are stealth - not advertised or guaranteed</span>
               </div>
             </div>
           </div>
@@ -298,25 +302,25 @@ function ProductCard({ product }: { product: typeof mockProducts[0] }) {
   let pennyDealPotential = '';
 
   if (lastDigit === '0' && cents !== '00') {
-    markdownLevel = '25% OFF';
+    markdownLevel = '1st Markdown';
     markdownBadgeColor = 'bg-blue-500';
-    pennyDealPotential = 'May drop to $X.06 in-store';
+    pennyDealPotential = 'Watch for further markdowns to $.X6';
   } else if (lastDigit === '2') {
-    markdownLevel = '90% OFF';
+    markdownLevel = '4th Markdown';
     markdownBadgeColor = 'bg-purple-600';
-    pennyDealPotential = '🔥 Check for $0.02 penny deal!';
+    pennyDealPotential = '🔥 Possible penny deal - scan in-store!';
   } else if (lastDigit === '3') {
-    markdownLevel = '75% OFF';
+    markdownLevel = '3rd Markdown';
     markdownBadgeColor = 'bg-indigo-600';
-    pennyDealPotential = 'May be $0.03 in-store!';
+    pennyDealPotential = 'May mark down further - check in-store';
   } else if (lastDigit === '4') {
-    markdownLevel = '50% OFF';
+    markdownLevel = '2nd Markdown';
     markdownBadgeColor = 'bg-teal-600';
-    pennyDealPotential = 'Could be $0.04 at your store';
+    pennyDealPotential = 'Potential for additional markdown';
   } else if (lastDigit === '6') {
-    markdownLevel = '25% OFF';
-    markdownBadgeColor = 'bg-blue-500';
-    pennyDealPotential = 'Might find at $0.06';
+    markdownLevel = 'Final Markdown';
+    markdownBadgeColor = 'bg-orange-500';
+    pennyDealPotential = 'Last stage - scan for penny pricing';
   }
 
   return (
