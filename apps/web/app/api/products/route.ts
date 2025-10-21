@@ -1,34 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import pkg from 'pg';
+const { Pool } = pkg;
 
-// Mock data - replace with actual DB queries
-const mockProducts = [
-  {
-    id: 1,
-    productId: 'HD-001',
-    title: 'LED Work Light 1000 Lumens',
-    price: 0.03,
-    originalPrice: 29.99,
-    category: 'Lighting',
-    modelNumber: 'LED-1000',
-    imageUrl: null,
-    url: 'https://www.homedepot.com/p/123456',
-    isClearancePrice: true,
-    scrapedAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    productId: 'HD-002',
-    title: 'Cordless Drill Battery Pack',
-    price: 0.88,
-    originalPrice: 49.99,
-    category: 'Tools',
-    modelNumber: 'BAT-18V',
-    imageUrl: null,
-    url: 'https://www.homedepot.com/p/789012',
-    isClearancePrice: true,
-    scrapedAt: new Date().toISOString(),
-  },
-];
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 /**
  * GET /api/products
@@ -47,47 +24,63 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(searchParams.get('limit') || '50');
 
   try {
-    // TODO: Replace with actual database query
-    // Example using @vercel/postgres:
-    // const { rows } = await sql`
-    //   SELECT * FROM clearance_deals
-    //   WHERE price <= ${maxPrice}
-    //   ${category !== 'All' ? sql`AND category = ${category}` : sql``}
-    //   ORDER BY price ASC
-    //   LIMIT ${limit}
-    // `;
+    let query = `
+      SELECT
+        id,
+        product_id,
+        title,
+        price,
+        original_price,
+        price_text,
+        category,
+        model_number,
+        url,
+        image_url,
+        is_clearance_price,
+        scraped_at
+      FROM products
+      WHERE is_clearance_price = true
+        AND price <= $1
+    `;
 
-    let filteredProducts = mockProducts.filter(p => {
-      if (category !== 'All' && p.category !== category) return false;
-      if (p.price > maxPrice) return false;
-      return true;
-    });
+    const params: any[] = [maxPrice];
 
-    // Simulate store availability if zipCode provided
-    const productsWithStores = filteredProducts.map(product => ({
-      ...product,
-      stores: zipCode ? [
-        {
-          storeName: 'Home Depot - Pasadena',
-          storeId: 'HD-001',
-          distance: 2.3,
-          inStock: Math.random() > 0.3,
-          stockStatus: 'In Stock',
-        },
-        {
-          storeName: 'Home Depot - Glendale',
-          storeId: 'HD-002',
-          distance: 4.1,
-          inStock: Math.random() > 0.3,
-          stockStatus: 'Limited Stock',
-        },
-      ] : [],
+    if (category !== 'All') {
+      query += ` AND category = $2`;
+      params.push(category);
+      query += ` ORDER BY price ASC LIMIT $3`;
+      params.push(limit);
+    } else {
+      query += ` ORDER BY price ASC LIMIT $2`;
+      params.push(limit);
+    }
+
+    const { rows } = await pool.query(query, params);
+
+    // Transform database rows to match expected format
+    const products = rows.map(row => ({
+      id: row.id,
+      productId: row.product_id,
+      title: row.title,
+      price: parseFloat(row.price),
+      originalPrice: row.original_price ? parseFloat(row.original_price) : null,
+      priceText: row.price_text,
+      category: row.category,
+      modelNumber: row.model_number,
+      url: row.url,
+      imageUrl: row.image_url,
+      isClearancePrice: row.is_clearance_price,
+      scrapedAt: row.scraped_at,
+      // Mock store data for now
+      inStock: true,
+      distance: '2-5 miles',
+      storeName: 'Home Depot',
     }));
 
     return NextResponse.json({
       success: true,
-      data: productsWithStores,
-      count: productsWithStores.length,
+      data: products,
+      count: products.length,
       filters: { category, maxPrice, zipCode },
     });
 
