@@ -139,7 +139,7 @@ export default function SearchPage() {
               <h1 className="text-2xl font-bold text-depot-dark">DepotClear</h1>
             </Link>
             <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg text-sm">
-              🎁 Demo Mode - <Link href="/#pricing" className="underline font-semibold">Get Full Access for $29</Link>
+              🎁 Demo Mode - <Link href="/#pricing" className="underline font-semibold">Get Full Access for $20</Link>
             </div>
           </div>
         </div>

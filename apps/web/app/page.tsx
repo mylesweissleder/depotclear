@@ -40,7 +40,7 @@ export default function HomePage() {
                 Try Free Demo
               </Link>
               <a href="#pricing" className="bg-depot-orange border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition text-lg">
-                Get Lifetime Access - $29
+                Get Lifetime Access - $20
               </a>
             </div>
             <p className="text-sm text-gray-400 mt-4">One-time payment. No subscriptions. Lifetime updates.</p>
@@ -170,7 +170,7 @@ export default function HomePage() {
             <div className="text-center">
               <h4 className="text-2xl font-bold mb-2">DepotClear Lifetime</h4>
               <div className="flex items-baseline justify-center mb-6">
-                <span className="text-5xl font-bold text-depot-orange">$29</span>
+                <span className="text-5xl font-bold text-depot-orange">$20</span>
                 <span className="text-gray-500 ml-2">one-time</span>
               </div>
               <ul className="text-left space-y-4 mb-8">
@@ -185,7 +185,7 @@ export default function HomePage() {
               <Link href="/checkout" className="block w-full bg-depot-orange text-white py-4 rounded-lg font-semibold hover:bg-orange-600 transition text-lg">
                 Get Lifetime Access Now
               </Link>
-              <p className="text-sm text-gray-500 mt-4">Secure payment via Stripe • 30-day money-back guarantee</p>
+              <p className="text-sm text-gray-500 mt-4">Secure payment via Stripe • 7-day money-back guarantee</p>
             </div>
           </div>
 
