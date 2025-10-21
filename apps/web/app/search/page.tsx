@@ -78,7 +78,7 @@ const categories = ['All', 'Tools', 'Lighting', 'Paint', 'Hardware', 'Outdoor'];
 export default function SearchPage() {
   const [zipCode, setZipCode] = useState('90210');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [maxPrice, setMaxPrice] = useState(1.00);
+  const [maxPrice, setMaxPrice] = useState(1000.00);
   const [showInStockOnly, setShowInStockOnly] = useState(true);
   const [products, setProducts] = useState(mockProducts);
   const [isLoading, setIsLoading] = useState(false);
@@ -175,8 +175,8 @@ export default function SearchPage() {
               <input
                 type="range"
                 min="0.01"
-                max="5.00"
-                step="0.01"
+                max="1000.00"
+                step="1.00"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
                 className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-depot-orange"
