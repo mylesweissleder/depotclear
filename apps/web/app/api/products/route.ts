@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pkg from 'pg';
-const { Pool } = pkg;
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+import { sql } from '@vercel/postgres';
 
 /**
  * GET /api/products
@@ -24,38 +18,54 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(searchParams.get('limit') || '50');
 
   try {
-    let query = `
-      SELECT
-        id,
-        product_id,
-        title,
-        price,
-        original_price,
-        price_text,
-        category,
-        model_number,
-        url,
-        image_url,
-        is_clearance_price,
-        scraped_at
-      FROM products
-      WHERE is_clearance_price = true
-        AND price <= $1
-    `;
-
-    const params: any[] = [maxPrice];
+    let result;
 
     if (category !== 'All') {
-      query += ` AND category = $2`;
-      params.push(category);
-      query += ` ORDER BY price ASC LIMIT $3`;
-      params.push(limit);
+      result = await sql`
+        SELECT
+          id,
+          product_id,
+          title,
+          price,
+          original_price,
+          price_text,
+          category,
+          model_number,
+          url,
+          image_url,
+          is_clearance_price,
+          scraped_at
+        FROM products
+        WHERE is_clearance_price = true
+          AND price <= ${maxPrice}
+          AND category = ${category}
+        ORDER BY price ASC
+        LIMIT ${limit}
+      `;
     } else {
-      query += ` ORDER BY price ASC LIMIT $2`;
-      params.push(limit);
+      result = await sql`
+        SELECT
+          id,
+          product_id,
+          title,
+          price,
+          original_price,
+          price_text,
+          category,
+          model_number,
+          url,
+          image_url,
+          is_clearance_price,
+          scraped_at
+        FROM products
+        WHERE is_clearance_price = true
+          AND price <= ${maxPrice}
+        ORDER BY price ASC
+        LIMIT ${limit}
+      `;
     }
 
-    const { rows } = await pool.query(query, params);
+    const { rows } = result;
 
     // Transform database rows to match expected format
     const products = rows.map(row => ({
@@ -71,10 +81,10 @@ export async function GET(request: NextRequest) {
       imageUrl: row.image_url,
       isClearancePrice: row.is_clearance_price,
       scrapedAt: row.scraped_at,
-      // Mock store data for now
+      // Mock store data for now - using the provided zipCode
       inStock: true,
-      distance: '2-5 miles',
-      storeName: 'Home Depot',
+      distance: '2.3 miles',
+      storeName: `Home Depot - ${zipCode || 'Local'}`,
     }));
 
     return NextResponse.json({
