@@ -80,7 +80,21 @@ class HomeDepotScraper {
    * @param {number} maxPages - Maximum pages to scrape
    */
   async scrapeCategory(category, maxPages = 3) {
-    const searchUrl = `${this.baseUrl}/s/${encodeURIComponent(category)}%20clearance?NCNI-5`;
+    // Use the actual clearance section with category filter
+    const categoryMap = {
+      'Tools': 'c1xy',
+      'Lighting': 'ajff',
+      'Hardware': 'c1zl',
+      'Paint': 'aqor',
+      'Outdoor': 'bx82',
+      'All': ''
+    };
+
+    const categoryCode = categoryMap[category] || '';
+    const searchUrl = categoryCode
+      ? `${this.baseUrl}/b/${category}/Clearance/N-5yc1vZ${categoryCode}Z1z11adf`
+      : `${this.baseUrl}/b/Clearance/N-5yc1vZ1z11adf`;
+
     console.log(`\n🔍 Searching: ${category} clearance`);
     console.log(`   URL: ${searchUrl}`);
 
@@ -113,11 +127,11 @@ class HomeDepotScraper {
 
         await this.randomDelay(1000, 2000);
 
-        const html = await this.page.content();
-        const pageItems = this.parseProductPage(html, category);
+        // Use dynamic parsing (works better for React-heavy sites)
+        const pageItems = await this.parseProductPageDynamic(category);
         items.push(...pageItems);
 
-        console.log(`      Found ${pageItems.length} items on page ${pageNum}`);
+        console.log(`      Found ${pageItems.length} clearance items on page ${pageNum}`);
 
         // Try to navigate to next page
         if (pageNum < maxPages) {
@@ -169,7 +183,82 @@ class HomeDepotScraper {
   }
 
   /**
-   * Parse product HTML and extract clearance items
+   * Parse product HTML using page.evaluate (works better for dynamic content)
+   */
+  async parseProductPageDynamic(category) {
+    try {
+      const products = await this.page.evaluate((cat) => {
+        const pods = document.querySelectorAll('[data-testid="product-pod"]');
+        const results = [];
+
+        pods.forEach((pod) => {
+          try {
+            // Get all text content
+            const text = pod.textContent || '';
+
+            // Find price with regex - handle both $123 and $1,234 formats
+            const priceMatch = text.match(/\$(\d+)(?:,(\d+))?\.?(\d{2})?/);
+
+            // Find title
+            const titleElem = pod.querySelector('h3, h2, [class*="product"]');
+            const title = titleElem ? titleElem.textContent.trim() : '';
+
+            // Find link
+            const linkElem = pod.querySelector('a[href*="/p/"]');
+            const url = linkElem ? linkElem.href : '';
+
+            // Find image
+            const imgElem = pod.querySelector('img');
+            const imageUrl = imgElem ? imgElem.src : null;
+
+            if (priceMatch && title) {
+              const dollars = priceMatch[1] + (priceMatch[2] || '');
+              const cents = priceMatch[3] || '00';
+              const price = parseFloat(`${dollars}.${cents}`);
+
+              // Check if it's a clearance indicator price
+              // .60 = 25% off (shows as .06 in-store)
+              // .40 = 50% off (shows as .04 in-store)
+              // .30 = 75% off (shows as .03 in-store)
+              // .20 = 90% off (shows as .02 in-store)
+              // .01 = penny item
+              const lastDigit = cents[1];
+              const isPennyDealPrice = ['0', '2', '3', '4', '6'].includes(lastDigit) && cents !== '00';
+
+              const isClearancePrice = price <= 1.00 || isPennyDealPrice;
+
+              if (isClearancePrice) {
+                results.push({
+                  title: title.substring(0, 200),
+                  price,
+                  priceText: `$${dollars}.${cents}`,
+                  category: cat,
+                  isClearancePrice: true,
+                  isPennyDealPrice,
+                  modelNumber: null,
+                  url,
+                  imageUrl,
+                  scrapedAt: new Date().toISOString(),
+                });
+              }
+            }
+          } catch (e) {
+            // Skip errors on individual products
+          }
+        });
+
+        return results;
+      }, category);
+
+      return products;
+    } catch (err) {
+      console.error('Error parsing products:', err.message);
+      return [];
+    }
+  }
+
+  /**
+   * Parse product HTML and extract clearance items (legacy cheerio method - fallback)
    */
   parseProductPage(html, category) {
     const $ = cheerio.load(html);
@@ -178,43 +267,48 @@ class HomeDepotScraper {
     $('[data-testid="product-pod"]').each((i, element) => {
       try {
         const $pod = $(element);
+        const podText = $pod.text();
 
-        // Extract product data
-        const title = $pod.find('[data-testid="product-header"]').text().trim();
-        const priceText = $pod.find('[data-testid="product-price"]').text().trim();
-        const link = $pod.find('a[data-testid="product-pod-link"]').attr('href');
+        // Find price
+        const priceMatch = podText.match(/\$(\d+)(?:,(\d+))?\.?(\d{2})?/);
+        if (!priceMatch) return;
+
+        const dollars = priceMatch[1] + (priceMatch[2] || '');
+        const cents = priceMatch[3] || '00';
+        const price = parseFloat(`${dollars}.${cents}`);
+
+        // Check clearance indicators
+        const lastDigit = cents[1];
+        const isPennyDealPrice = ['0', '2', '3', '4', '6'].includes(lastDigit) && cents !== '00';
+        const isClearancePrice = price <= 1.00 || isPennyDealPrice;
+
+        if (!isClearancePrice) return;
+
+        // Extract title
+        let title = $pod.find('h3, h2').first().text().trim();
+
+        // Extract link
+        const link = $pod.find('a[href*="/p/"]').first().attr('href');
+
+        // Extract image
         const image = $pod.find('img').first().attr('src');
-        const modelNumber = $pod.find('[data-testid="product-model"]').text().trim();
 
-        // Parse price
-        const priceMatch = priceText.match(/\$?([\d,]+\.?\d*)/);
-        const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '')) : null;
-
-        // Check if it's a clearance-priced item (ends in .01, .03, .06, .88, .99 or <= $1)
-        const isClearancePrice = price !== null && (
-          price <= 1.00 ||
-          priceText.includes('.01') ||
-          priceText.includes('.03') ||
-          priceText.includes('.06') ||
-          priceText.includes('.88') ||
-          priceText.includes('.99')
-        );
-
-        if (title && price !== null) {
+        if (title) {
           products.push({
-            title,
+            title: title.substring(0, 200),
             price,
-            priceText,
+            priceText: `$${dollars}.${cents}`,
             category,
-            isClearancePrice,
-            modelNumber,
-            url: link ? `${this.baseUrl}${link}` : null,
+            isClearancePrice: true,
+            isPennyDealPrice,
+            modelNumber: null,
+            url: link ? (link.startsWith('http') ? link : `${this.baseUrl}${link}`) : null,
             imageUrl: image,
             scrapedAt: new Date().toISOString(),
           });
         }
       } catch (err) {
-        console.error('Error parsing product:', err.message);
+        // Skip errors
       }
     });
 

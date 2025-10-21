@@ -76,13 +76,9 @@ async function main() {
   try {
     await scraper.initialize();
 
-    // Define categories to scrape
+    // Scrape the main clearance section (has all categories)
     const categories = [
-      'Tools',
-      'Lighting',
-      'Hardware',
-      'Paint',
-      'Outdoor'
+      'All'  // This will use the main clearance URL
     ];
 
     const allProducts = [];
@@ -90,11 +86,8 @@ async function main() {
     console.log('🏠 Starting Home Depot clearance scraper...\n');
 
     for (const category of categories) {
-      const items = await scraper.scrapeCategory(category, 2); // 2 pages per category
+      const items = await scraper.scrapeCategory(category, 3); // 3 pages
       allProducts.push(...items);
-
-      // Be respectful - pause between categories
-      await new Promise(resolve => setTimeout(resolve, 3000));
     }
 
     // Filter clearance items
