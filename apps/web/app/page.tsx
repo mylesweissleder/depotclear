@@ -54,12 +54,12 @@ export default function HomePage() {
                 Woof! Find the
               </span>
               <br />
-              <span className="text-gray-900">Perfect Dog Daycare</span>
+              <span className="text-gray-900">Perfect Dog Care</span>
               <br />
               <span className="text-orange-500">for Your Pup 🐾</span>
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
-              The nation's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog daycares!
+              The nation's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog care services!
               <br />
               Compare ratings, read reviews, and find the perfect spot for your furry friend.
             </p>
