@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         await sql`
           UPDATE dog_daycares
           SET is_premium = true,
-              premium_expires_at = ${expiresAt},
+              premium_expires_at = ${expiresAt.toISOString()},
               premium_plan = ${plan || 'monthly'},
               stripe_customer_id = ${session.customer as string},
               stripe_subscription_id = ${session.subscription as string || null},
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
         await sql`
           UPDATE dog_daycares
-          SET premium_expires_at = ${expiresAt},
+          SET premium_expires_at = ${expiresAt.toISOString()},
               is_premium = ${subscription.status === 'active'},
               updated_at = NOW()
           WHERE stripe_subscription_id = ${subscription.id}
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
           await sql`
             UPDATE dog_daycares
-            SET premium_expires_at = ${expiresAt},
+            SET premium_expires_at = ${expiresAt.toISOString()},
                 is_premium = true,
                 updated_at = NOW()
             WHERE stripe_subscription_id = ${subscription.id}
