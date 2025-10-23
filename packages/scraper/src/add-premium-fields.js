@@ -19,6 +19,9 @@ async function addPremiumFields() {
       ALTER TABLE dog_daycares
       ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS premium_expires_at TIMESTAMP,
+      ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+      ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT,
+      ADD COLUMN IF NOT EXISTS premium_plan TEXT CHECK (premium_plan IN ('monthly', 'annual')),
       ADD COLUMN IF NOT EXISTS description TEXT,
       ADD COLUMN IF NOT EXISTS amenities JSONB,
       ADD COLUMN IF NOT EXISTS photos JSONB,
