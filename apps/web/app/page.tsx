@@ -128,6 +128,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <FunDaycareCard
+              id={1}
               name="Pet Camp San Francisco"
               city="San Francisco"
               rating={4.7}
@@ -136,6 +137,7 @@ export default function HomePage() {
               color="orange"
             />
             <FunDaycareCard
+              id={5}
               name="Embarkadero Social Club"
               city="San Francisco"
               rating={4.9}
@@ -144,9 +146,10 @@ export default function HomePage() {
               color="purple"
             />
             <FunDaycareCard
+              id={25}
               name="Bark Avenue"
               city="San Francisco"
-              rating={4.6}
+              rating={5.0}
               reviews={521}
               badge="💰 Best Value"
               color="green"
@@ -344,7 +347,7 @@ function FunStepCard({ number, emoji, title, description }: { number: string; em
   );
 }
 
-function FunDaycareCard({ name, city, rating, reviews, badge, color }: { name: string; city: string; rating: number; reviews: number; badge: string; color: string }) {
+function FunDaycareCard({ id, name, city, rating, reviews, badge, color }: { id: number; name: string; city: string; rating: number; reviews: number; badge: string; color: string }) {
   const colors: Record<string, string> = {
     orange: 'from-orange-400 to-pink-500',
     purple: 'from-purple-400 to-pink-500',
@@ -374,7 +377,7 @@ function FunDaycareCard({ name, city, rating, reviews, badge, color }: { name: s
         </div>
 
         <Link
-          href="/search"
+          href={`/listing/${id}`}
           className={`block w-full bg-gradient-to-r ${colors[color]} text-white text-center py-4 rounded-2xl font-black shadow-lg hover:shadow-xl transition transform hover:scale-105`}
         >
           View Details →
