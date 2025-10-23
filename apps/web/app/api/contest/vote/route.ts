@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pkg from 'pg';
-const { Pool } = pkg;
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+import { sql } from '@vercel/postgres';
 
 /**
  * POST /api/contest/vote
@@ -43,11 +37,10 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Check if this email already voted for this submission
-    const existingVote = await pool.query(
-      `SELECT id FROM pup_votes
-       WHERE submission_id = $1 AND voter_email = $2`,
-      [submissionId, voterEmail]
-    );
+    const existingVote = await sql`
+      SELECT id FROM pup_votes
+      WHERE submission_id = ${submissionId} AND voter_email = ${voterEmail}
+    `;
 
     if (existingVote.rows.length > 0) {
       return NextResponse.json(
@@ -57,12 +50,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check rate limiting - max 10 votes per IP in 1 hour
-    const recentVotes = await pool.query(
-      `SELECT COUNT(*) as count FROM pup_votes
-       WHERE ip_address = $1
-       AND created_at > NOW() - INTERVAL '1 hour'`,
-      [ipAddress]
-    );
+    const recentVotes = await sql`
+      SELECT COUNT(*) as count FROM pup_votes
+      WHERE ip_address = ${ipAddress}
+      AND created_at > NOW() - INTERVAL '1 hour'
+    `;
 
     if (parseInt(recentVotes.rows[0].count) >= 10) {
       return NextResponse.json(
@@ -72,27 +64,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Record the vote
-    await pool.query(
-      `INSERT INTO pup_votes
-       (submission_id, voter_email, ip_address, user_agent, vote_weight)
-       VALUES ($1, $2, $3, $4, 1.0)`,
-      [submissionId, voterEmail, ipAddress, userAgent]
-    );
+    await sql`
+      INSERT INTO pup_votes
+      (submission_id, voter_email, ip_address, user_agent, vote_weight)
+      VALUES (${submissionId}, ${voterEmail}, ${ipAddress}, ${userAgent}, 1.0)
+    `;
 
     // Update submission vote counts
-    const result = await pool.query(
-      `UPDATE pup_submissions
-       SET votes = votes + 1,
-           unique_voters = (
-             SELECT COUNT(DISTINCT voter_email)
-             FROM pup_votes
-             WHERE submission_id = $1
-           ),
-           updated_at = NOW()
-       WHERE id = $1
-       RETURNING votes, unique_voters, pup_name`,
-      [submissionId]
-    );
+    const result = await sql`
+      UPDATE pup_submissions
+      SET votes = votes + 1,
+          unique_voters = (
+            SELECT COUNT(DISTINCT voter_email)
+            FROM pup_votes
+            WHERE submission_id = ${submissionId}
+          ),
+          updated_at = NOW()
+      WHERE id = ${submissionId}
+      RETURNING votes, unique_voters, pup_name
+    `;
 
     const updated = result.rows[0];
 
@@ -128,11 +118,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ hasVoted: false });
     }
 
-    const result = await pool.query(
-      `SELECT id FROM pup_votes
-       WHERE submission_id = $1 AND voter_email = $2`,
-      [submissionId, voterEmail]
-    );
+    const result = await sql`
+      SELECT id FROM pup_votes
+      WHERE submission_id = ${submissionId} AND voter_email = ${voterEmail}
+    `;
 
     return NextResponse.json({ hasVoted: result.rows.length > 0 });
 

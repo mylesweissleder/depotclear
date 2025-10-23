@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pkg from 'pg';
-const { Pool } = pkg;
+import { sql } from '@vercel/postgres';
 import { Filter } from 'bad-words';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
 
 const filter = new Filter();
 
@@ -88,26 +82,25 @@ export async function POST(request: NextRequest) {
     const contestMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     // Insert submission
-    const result = await pool.query(
-      `INSERT INTO pup_submissions (
+    const result = await sql`
+      INSERT INTO pup_submissions (
         pup_name, owner_name, owner_email, daycare_name,
         photo_url, caption, category, is_ai_generated,
         contest_month, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING id`,
-      [
-        pupName,
-        ownerName,
-        ownerEmail,
-        daycareName || null,
-        photoUrl,
-        caption,
-        category,
-        isAiGenerated,
-        contestMonth,
-        'pending', // Requires moderation approval
-      ]
-    );
+      ) VALUES (
+        ${pupName},
+        ${ownerName},
+        ${ownerEmail},
+        ${daycareName || null},
+        ${photoUrl},
+        ${caption},
+        ${category},
+        ${isAiGenerated},
+        ${contestMonth},
+        ${'pending'}
+      )
+      RETURNING id
+    `;
 
     const submissionId = result.rows[0].id;
 
