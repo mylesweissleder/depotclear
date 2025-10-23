@@ -32,16 +32,22 @@ export default function SearchPage() {
       });
 
       const response = await fetch(`/api/daycares?${params}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('Daycares API response:', data);
 
       if (data.success) {
-        setDaycares(data.data);
+        setDaycares(data.data || []);
       } else {
-        setError('Failed to load daycares');
+        setError(data.error || 'Failed to load daycares');
       }
-    } catch (err) {
-      setError('Network error');
-      console.error(err);
+    } catch (err: any) {
+      setError(`Failed to load daycares: ${err.message}`);
+      console.error('Fetch error:', err);
     } finally {
       setIsLoading(false);
     }

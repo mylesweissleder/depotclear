@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+import { sql } from '@vercel/postgres';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,33 +10,54 @@ export async function GET(request: NextRequest) {
     const minRating = parseFloat(searchParams.get('minRating') || '0');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    let query = `
-      SELECT
-        id, name, rating, review_count, address, phone, website,
-        google_maps_url, price_level, city, region, scraped_at
-      FROM dog_daycares
-      WHERE region = $1
-    `;
+    // Build query dynamically based on filters
+    let result;
 
-    const params: any[] = [region];
-    let paramCount = 2;
-
-    if (city !== 'All') {
-      query += ` AND city = $${paramCount}`;
-      params.push(city);
-      paramCount++;
+    if (city !== 'All' && minRating > 0) {
+      result = await sql`
+        SELECT
+          id, name, rating, review_count, address, phone, website,
+          google_maps_url, price_level, city, region, scraped_at
+        FROM dog_daycares
+        WHERE region = ${region}
+          AND city = ${city}
+          AND rating >= ${minRating}
+        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        LIMIT ${limit}
+      `;
+    } else if (city !== 'All') {
+      result = await sql`
+        SELECT
+          id, name, rating, review_count, address, phone, website,
+          google_maps_url, price_level, city, region, scraped_at
+        FROM dog_daycares
+        WHERE region = ${region}
+          AND city = ${city}
+        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        LIMIT ${limit}
+      `;
+    } else if (minRating > 0) {
+      result = await sql`
+        SELECT
+          id, name, rating, review_count, address, phone, website,
+          google_maps_url, price_level, city, region, scraped_at
+        FROM dog_daycares
+        WHERE region = ${region}
+          AND rating >= ${minRating}
+        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        LIMIT ${limit}
+      `;
+    } else {
+      result = await sql`
+        SELECT
+          id, name, rating, review_count, address, phone, website,
+          google_maps_url, price_level, city, region, scraped_at
+        FROM dog_daycares
+        WHERE region = ${region}
+        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        LIMIT ${limit}
+      `;
     }
-
-    if (minRating > 0) {
-      query += ` AND rating >= $${paramCount}`;
-      params.push(minRating);
-      paramCount++;
-    }
-
-    query += ` ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST LIMIT $${paramCount}`;
-    params.push(limit);
-
-    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
