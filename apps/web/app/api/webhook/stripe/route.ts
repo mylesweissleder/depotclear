@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
 });
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
 /**
- * POST /api/webhook
- * Stripe webhook handler for payment events
+ * POST /api/webhook/stripe
+ * Stripe webhook handler for premium subscription events
  */
 export async function POST(request: NextRequest) {
   try {
@@ -21,57 +28,145 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify webhook signature
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
+    console.log('Webhook received:', event.type);
+
     switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object;
-        const email = session.metadata?.email;
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const { email, daycareId, plan } = session.metadata || {};
 
-        console.log('Payment completed for:', email);
-
-        // TODO: Grant lifetime access in database
-        // await sql`
-        //   INSERT INTO users (email, stripe_customer_id, stripe_payment_id, has_lifetime_access, created_at)
-        //   VALUES (${email}, ${session.customer}, ${session.payment_intent}, true, NOW())
-        //   ON CONFLICT (email)
-        //   DO UPDATE SET
-        //     has_lifetime_access = true,
-        //     stripe_payment_id = ${session.payment_intent}
-        // `;
-
-        // TODO: Send welcome email
-        break;
-
-      case 'charge.refunded':
-        const charge = event.data.object;
-
-        // Check if refund is within 7-day window
-        const chargeCreated = new Date(charge.created * 1000);
-        const now = new Date();
-        const daysSinceCharge = (now.getTime() - chargeCreated.getTime()) / (1000 * 60 * 60 * 24);
-
-        console.log(`Refund requested ${daysSinceCharge.toFixed(1)} days after purchase`);
-
-        if (daysSinceCharge > 7) {
-          console.warn('⚠️ Refund outside 7-day window - manual review required');
-          // TODO: Send alert to admin
-          // Still revoke access, but flag for review
+        if (!email || !daycareId) {
+          console.error('Missing metadata:', session.metadata);
+          break;
         }
 
-        // Revoke access
-        // await sql`UPDATE users SET has_lifetime_access = false WHERE stripe_payment_id = ${charge.payment_intent}`;
+        console.log(`Premium purchase complete: ${email}, daycare ${daycareId}, plan ${plan}`);
 
+        // Determine expiration date
+        let expiresAt: Date;
+        if (plan === 'annual') {
+          // Annual: expires in 1 year
+          expiresAt = new Date();
+          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        } else {
+          // Monthly: expires in 1 month (will be renewed by subscription)
+          expiresAt = new Date();
+          expiresAt.setMonth(expiresAt.getMonth() + 1);
+        }
+
+        // Update daycare to premium
+        await pool.query(
+          `UPDATE dog_daycares
+           SET is_premium = true,
+               premium_expires_at = $1,
+               premium_plan = $2,
+               stripe_customer_id = $3,
+               stripe_subscription_id = $4,
+               business_email = $5,
+               updated_at = NOW()
+           WHERE id = $6`,
+          [
+            expiresAt,
+            plan || 'monthly',
+            session.customer,
+            session.subscription || null,
+            email,
+            parseInt(daycareId)
+          ]
+        );
+
+        console.log(`✅ Daycare ${daycareId} upgraded to premium (${plan})`);
         break;
+      }
+
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        // Update expiration date when subscription renews
+        const expiresAt = new Date(subscription.current_period_end * 1000);
+
+        await pool.query(
+          `UPDATE dog_daycares
+           SET premium_expires_at = $1,
+               is_premium = $2,
+               updated_at = NOW()
+           WHERE stripe_subscription_id = $3`,
+          [
+            expiresAt,
+            subscription.status === 'active',
+            subscription.id
+          ]
+        );
+
+        console.log(`✅ Subscription ${subscription.id} updated, expires ${expiresAt}`);
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        // Subscription cancelled - downgrade to free
+        await pool.query(
+          `UPDATE dog_daycares
+           SET is_premium = false,
+               premium_expires_at = NOW(),
+               stripe_subscription_id = NULL,
+               updated_at = NOW()
+           WHERE stripe_subscription_id = $1`,
+          [subscription.id]
+        );
+
+        console.log(`❌ Subscription ${subscription.id} cancelled - downgraded to free`);
+        break;
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+
+        // Monthly renewal successful - extend premium
+        if (invoice.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const expiresAt = new Date(subscription.current_period_end * 1000);
+
+          await pool.query(
+            `UPDATE dog_daycares
+             SET premium_expires_at = $1,
+                 is_premium = true,
+                 updated_at = NOW()
+             WHERE stripe_subscription_id = $2`,
+            [expiresAt, subscription.id]
+          );
+
+          console.log(`💰 Invoice paid for subscription ${subscription.id}, extended to ${expiresAt}`);
+        }
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+
+        // Payment failed - mark as at risk but don't immediately downgrade
+        // Stripe will retry, we'll only downgrade on subscription.deleted
+        console.warn(`⚠️ Payment failed for subscription ${invoice.subscription}`);
+
+        // Could send an email notification here
+        break;
+      }
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ success: true, received: true });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Webhook error:', error);
     return NextResponse.json(
       { success: false, error: 'Webhook processing failed' },
