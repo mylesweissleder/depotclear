@@ -15,6 +15,7 @@ export default function ContestPage() {
     { id: 'funniest-fail', name: '😂 Epic Fail', description: 'Dogs being hilariously clumsy' },
     { id: 'most-dramatic', name: '🎭 Drama Queen/King', description: 'Overreacting to everything' },
     { id: 'worst-sleeper', name: '😴 Weirdest Sleep', description: 'How is that even comfortable?' },
+    { id: 'ai-dog', name: '🤖 AI Dog', description: 'Best AI-generated dog (AI ONLY!)' },
   ];
 
   return (
@@ -199,11 +200,14 @@ export default function ContestPage() {
               <li>• Photo must be of a dog (obviously)</li>
               <li>• Photo must be appropriate (no violence, nudity, etc.)</li>
               <li>• You must be the dog's owner or have permission</li>
+              <li className="text-red-600 font-bold">• <strong>NO AI-GENERATED IMAGES</strong> in non-AI categories (AI Dog category only!)</li>
+              <li className="text-green-600 font-bold">• <strong>AI Dog category:</strong> ONLY AI-generated images allowed (MidJourney, DALL-E, Stable Diffusion, etc.)</li>
               <li>• One submission per dog per category</li>
               <li>• Contest runs monthly (1st-last day of month)</li>
               <li>• Winners announced first Monday of following month</li>
               <li>• Prizes paid via PayPal, Venmo, or check</li>
               <li>• By submitting, you grant us rights to share your photo on social media</li>
+              <li className="text-red-600">• <strong>Disqualification:</strong> AI images in non-AI categories will be removed</li>
             </ul>
           </div>
         </div>
@@ -270,12 +274,13 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
   });
 
   const categories = [
-    { value: 'goofiest-face', label: '🤪 Goofiest Face' },
-    { value: 'biggest-derp', label: '🥴 Biggest Derp' },
-    { value: 'worst-haircut', label: '✂️ Worst Haircut' },
-    { value: 'funniest-fail', label: '😂 Epic Fail' },
-    { value: 'most-dramatic', label: '🎭 Drama Queen/King' },
-    { value: 'worst-sleeper', label: '😴 Weirdest Sleep' },
+    { value: 'goofiest-face', label: '🤪 Goofiest Face (Real Photos Only)' },
+    { value: 'biggest-derp', label: '🥴 Biggest Derp (Real Photos Only)' },
+    { value: 'worst-haircut', label: '✂️ Worst Haircut (Real Photos Only)' },
+    { value: 'funniest-fail', label: '😂 Epic Fail (Real Photos Only)' },
+    { value: 'most-dramatic', label: '🎭 Drama Queen/King (Real Photos Only)' },
+    { value: 'worst-sleeper', label: '😴 Weirdest Sleep (Real Photos Only)' },
+    { value: 'ai-dog', label: '🤖 AI Dog (AI-Generated ONLY!)' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {

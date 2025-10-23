@@ -46,8 +46,12 @@ async function updateContestSchema() {
           'worst-haircut',
           'funniest-fail',
           'most-dramatic',
-          'worst-sleeper'
+          'worst-sleeper',
+          'ai-dog'
         )),
+
+        -- AI Flag
+        is_ai_generated BOOLEAN DEFAULT FALSE,
 
         -- Voting & Status
         votes INTEGER DEFAULT 0,
@@ -139,7 +143,8 @@ async function updateContestSchema() {
     console.log('   ✂️ worst-haircut - "Worst Grooming Disaster"');
     console.log('   😂 funniest-fail - "Epic Dog Fail"');
     console.log('   🎭 most-dramatic - "Drama Queen/King Award"');
-    console.log('   😴 worst-sleeper - "Weirdest Sleep Position"\n');
+    console.log('   😴 worst-sleeper - "Weirdest Sleep Position"');
+    console.log('   🤖 ai-dog - "Best AI Generated Dog (AI ONLY!)"\n');
 
     console.log('🛡️ Anti-Gaming Features:\n');
     console.log('   ✓ Email verification required');
