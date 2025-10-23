@@ -230,6 +230,14 @@ export default function ContestPage() {
                       </h3>
                     </div>
                   </div>
+                  {/* Category badge - positioned bottom-right */}
+                  <div className="absolute bottom-6 right-6">
+                    <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg">
+                      <p className="text-sm font-bold text-purple-600">
+                        {categories.find(c => c.id === entry.category)?.name || entry.category}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-6">
@@ -392,9 +400,18 @@ export default function ContestPage() {
 }
 
 function CategoryCard({ id, name, description, image, onClick }: any) {
+  const handleClick = () => {
+    // Set the category filter
+    onClick();
+    // Scroll to entries section
+    const entriesSection = document.querySelector('#contest-entries');
+    if (entriesSection) {
+      entriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div
-      onClick={onClick}
       className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 border-4 border-transparent hover:border-purple-300 cursor-pointer"
     >
       <div className="h-48 overflow-hidden relative">
@@ -408,7 +425,10 @@ function CategoryCard({ id, name, description, image, onClick }: any) {
       <div className="p-8">
         <h3 className="text-4xl font-black mb-3">{name}</h3>
         <p className="text-gray-600 text-lg mb-4">{description}</p>
-        <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition">
+        <button
+          onClick={handleClick}
+          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
+        >
           View Entries →
         </button>
       </div>
