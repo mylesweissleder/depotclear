@@ -40,7 +40,7 @@ export default function SearchPage() {
       const params = new URLSearchParams({
         city: selectedCity,
         minRating: minRating.toString(),
-        limit: '100',
+        limit: '500',
       });
 
       const response = await fetch(`/api/daycares?${params}`);
@@ -70,8 +70,9 @@ export default function SearchPage() {
     fetchDaycares();
   }, [fetchDaycares]);
 
-  const avgRating = daycares.length > 0
-    ? (daycares.reduce((sum, d) => sum + (d.rating || 0), 0) / daycares.filter(d => d.rating).length).toFixed(1)
+  const daycareswithRatings = daycares.filter(d => d.rating && d.rating > 0);
+  const avgRating = daycareswithRatings.length > 0
+    ? (daycareswithRatings.reduce((sum, d) => sum + parseFloat(d.rating), 0) / daycareswithRatings.length).toFixed(1)
     : '0.0';
 
   return (
