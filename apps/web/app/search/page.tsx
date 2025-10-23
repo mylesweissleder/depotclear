@@ -6,10 +6,22 @@ import Link from 'next/link';
 
 const bayAreaCities = [
   'All',
-  // By county
-  'San Francisco', 'Oakland', 'Berkeley', 'San Jose', 'Palo Alto',
-  'Mountain View', 'Sunnyvale', 'Fremont', 'Hayward', 'San Mateo',
-  'Redwood City', 'Santa Rosa', 'Walnut Creek', 'San Rafael', 'Napa',
+  // San Francisco County
+  'San Francisco',
+  // Alameda County
+  'Oakland', 'Berkeley', 'Fremont', 'Hayward', 'Alameda',
+  // Contra Costa County
+  'Walnut Creek', 'Concord', 'Richmond',
+  // Marin County
+  'San Rafael', 'Novato', 'Mill Valley', 'Sausalito', 'Tiburon',
+  // Napa County
+  'Napa',
+  // San Mateo County
+  'San Mateo', 'Redwood City', 'Palo Alto', 'Mountain View',
+  // Santa Clara County
+  'San Jose', 'Sunnyvale', 'Santa Clara',
+  // Sonoma County
+  'Santa Rosa', 'Petaluma',
 ];
 
 export default function SearchPage() {
