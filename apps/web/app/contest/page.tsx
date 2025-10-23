@@ -3,19 +3,101 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Camera, Trophy, Share2, Heart, AlertCircle, Upload, X } from 'lucide-react';
+import { useUploadThing } from '@/lib/uploadthing';
 
 export default function ContestPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showVoteModal, setShowVoteModal] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<any>(null);
+  const [voterEmail, setVoterEmail] = useState('');
+  const [voteCounts, setVoteCounts] = useState<Record<number, number>>({});
+  const [votedEntries, setVotedEntries] = useState<Set<number>>(new Set());
 
   const categories = [
-    { id: 'goofiest-face', name: '🤪 Goofiest Face', description: 'Most ridiculous dog face' },
-    { id: 'biggest-derp', name: '🥴 Biggest Derp', description: 'Ultimate derp moment captured' },
-    { id: 'worst-haircut', name: '✂️ Worst Haircut', description: 'Grooming disaster hall of fame' },
-    { id: 'funniest-fail', name: '😂 Epic Fail', description: 'Dogs being hilariously clumsy' },
-    { id: 'most-dramatic', name: '🎭 Drama Queen/King', description: 'Overreacting to everything' },
-    { id: 'worst-sleeper', name: '😴 Weirdest Sleep', description: 'How is that even comfortable?' },
-    { id: 'ai-dog', name: '🤖 AI Dog', description: 'Best AI-generated dog (AI ONLY!)' },
+    { id: 'goofiest-face', name: '🤪 Goofiest Face', description: 'Most ridiculous dog face', image: 'https://images.dog.ceo/breeds/bulldog-french/n02108915_1866.jpg' },
+    { id: 'biggest-derp', name: '🥴 Biggest Derp', description: 'Ultimate derp moment captured', image: 'https://images.dog.ceo/breeds/husky/n02110185_1511.jpg' },
+    { id: 'worst-haircut', name: '✂️ Worst Haircut', description: 'Grooming disaster hall of fame', image: 'https://images.dog.ceo/breeds/poodle-standard/n02113799_4261.jpg' },
+    { id: 'funniest-fail', name: '😂 Epic Fail', description: 'Dogs being hilariously clumsy', image: 'https://images.dog.ceo/breeds/corgi-cardigan/n02113186_8415.jpg' },
+    { id: 'most-dramatic', name: '🎭 Drama Queen/King', description: 'Overreacting to everything', image: 'https://images.dog.ceo/breeds/chihuahua/n02085620_3407.jpg' },
+    { id: 'worst-sleeper', name: '😴 Weirdest Sleep', description: 'How is that even comfortable?', image: 'https://images.dog.ceo/breeds/setter-english/n02100735_4657.jpg' },
+    { id: 'ai-dog', name: '🤖 AI Dog', description: 'Best AI-generated dog (AI ONLY!)', image: 'https://images.dog.ceo/breeds/shiba/shiba-13.jpg' },
+  ];
+
+  // Handle vote button click
+  const handleVoteClick = (entry: any) => {
+    setSelectedEntry(entry);
+    setShowVoteModal(true);
+  };
+
+  // Submit vote
+  const handleVoteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedEntry || !voterEmail) return;
+
+    try {
+      const res = await fetch('/api/contest/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId: selectedEntry.id,
+          voterEmail,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Update vote count locally
+        setVoteCounts(prev => ({
+          ...prev,
+          [selectedEntry.id]: data.votes
+        }));
+
+        // Mark as voted
+        setVotedEntries(prev => new Set([...prev, selectedEntry.id]));
+
+        // Store email in localStorage
+        localStorage.setItem('voterEmail', voterEmail);
+
+        alert(data.message);
+        setShowVoteModal(false);
+        setVoterEmail('');
+      } else {
+        alert(data.error || 'Failed to vote');
+      }
+    } catch (error) {
+      console.error('Vote error:', error);
+      alert('Failed to vote. Please try again.');
+    }
+  };
+
+  // Share entry
+  const handleShare = (entry: any) => {
+    const url = `${window.location.origin}/contest/${entry.id}`;
+    const text = `Vote for ${entry.pupName}! ${entry.caption}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Vote for ${entry.pupName}!`,
+        text,
+        url,
+      });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  // Sample submissions to seed the contest
+  const sampleSubmissions = [
+    { id: 1, pupName: 'Maximus', category: 'goofiest-face', votes: 234, image: 'https://images.dog.ceo/breeds/pug/n02110958_14790.jpg', caption: 'My face when I hear the treat bag open' },
+    { id: 2, pupName: 'Bella', category: 'biggest-derp', votes: 189, image: 'https://images.dog.ceo/breeds/shihtzu/n02086240_5830.jpg', caption: 'Tongue stuck mid-blink' },
+    { id: 3, pupName: 'Charlie', category: 'worst-haircut', votes: 156, image: 'https://images.dog.ceo/breeds/poodle-toy/n02113624_1885.jpg', caption: 'The groomer said "trust me"...' },
+    { id: 4, pupName: 'Luna', category: 'funniest-fail', votes: 278, image: 'https://images.dog.ceo/breeds/bulldog-english/jager-1.jpg', caption: 'Tried to jump, became a pancake' },
+    { id: 5, pupName: 'Cooper', category: 'most-dramatic', votes: 201, image: 'https://images.dog.ceo/breeds/spaniel-cocker/n02102318_4843.jpg', caption: 'When you say NO to second breakfast' },
+    { id: 6, pupName: 'Daisy', category: 'worst-sleeper', votes: 167, image: 'https://images.dog.ceo/breeds/beagle/n02088364_11843.jpg', caption: 'Upside down, half off the couch, living my best life' },
   ];
 
   return (
@@ -123,6 +205,81 @@ export default function ContestPage() {
         </div>
       </section>
 
+      {/* Current Entries */}
+      <section className="py-20 bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-black mb-4">🏆 Contest Entries</h2>
+            <p className="text-xl text-gray-600">Vote for your favorite ridiculous pups!</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {sampleSubmissions.map((entry) => (
+              <div key={entry.id} className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                <div className="relative h-80 overflow-hidden">
+                  <img
+                    src={entry.image}
+                    alt={entry.pupName}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Dog name badge - big, bold, and fun - positioned top-left to avoid covering dog */}
+                  <div className="absolute top-6 left-6">
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-2xl shadow-2xl transform -rotate-2">
+                      <h3 className="text-3xl font-black text-white drop-shadow-lg">
+                        {entry.pupName}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <p className="text-gray-700 text-lg mb-4 italic">"{entry.caption}"</p>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-3xl">❤️</span>
+                      <span className="text-2xl font-bold text-purple-600">
+                        {voteCounts[entry.id] !== undefined ? voteCounts[entry.id] : entry.votes}
+                      </span>
+                      <span className="text-gray-500">votes</span>
+                    </div>
+
+                    <button
+                      onClick={() => handleShare(entry)}
+                      className="text-gray-500 hover:text-purple-600 transition"
+                      title="Share"
+                    >
+                      <Share2 className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => handleVoteClick(entry)}
+                    disabled={votedEntries.has(entry.id)}
+                    className={`w-full py-3 rounded-xl font-bold transition ${
+                      votedEntries.has(entry.id)
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg'
+                    }`}
+                  >
+                    {votedEntries.has(entry.id) ? '✓ Voted!' : '❤️ Vote'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <button
+              onClick={() => setShowSubmitModal(true)}
+              className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-12 py-5 rounded-full font-black text-xl shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110"
+            >
+              📸 Add Your Pup to the Contest!
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -217,21 +374,44 @@ export default function ContestPage() {
       {showSubmitModal && (
         <SubmitPhotoModal onClose={() => setShowSubmitModal(false)} />
       )}
+
+      {showVoteModal && (
+        <VoteModal
+          entry={selectedEntry}
+          onClose={() => {
+            setShowVoteModal(false);
+            setSelectedEntry(null);
+          }}
+          onSubmit={handleVoteSubmit}
+          voterEmail={voterEmail}
+          setVoterEmail={setVoterEmail}
+        />
+      )}
     </div>
   );
 }
 
-function CategoryCard({ id, name, description, onClick }: any) {
+function CategoryCard({ id, name, description, image, onClick }: any) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 border-4 border-transparent hover:border-purple-300 cursor-pointer"
+      className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 border-4 border-transparent hover:border-purple-300 cursor-pointer"
     >
-      <h3 className="text-4xl font-black mb-3">{name}</h3>
-      <p className="text-gray-600 text-lg mb-4">{description}</p>
-      <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition">
-        View Entries →
-      </button>
+      <div className="h-48 overflow-hidden relative">
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+      </div>
+      <div className="p-8">
+        <h3 className="text-4xl font-black mb-3">{name}</h3>
+        <p className="text-gray-600 text-lg mb-4">{description}</p>
+        <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition">
+          View Entries →
+        </button>
+      </div>
     </div>
   );
 }
@@ -297,6 +477,8 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
     }
   };
 
+  const { startUpload } = useUploadThing("contestImage");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -309,21 +491,14 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
     setUploading(true);
 
     try {
-      // 1. Upload photo to Vercel Blob
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', selectedFile);
+      // 1. Upload photo using Uploadthing
+      const uploadResult = await startUpload([selectedFile]);
 
-      const uploadRes = await fetch('/api/contest/upload', {
-        method: 'POST',
-        body: uploadFormData,
-      });
-
-      if (!uploadRes.ok) {
-        const uploadError = await uploadRes.json();
-        throw new Error(uploadError.error || 'Failed to upload photo');
+      if (!uploadResult || uploadResult.length === 0) {
+        throw new Error('Failed to upload photo');
       }
 
-      const { url: photoUrl } = await uploadRes.json();
+      const photoUrl = uploadResult[0].url;
 
       // 2. Submit contest entry
       const submitRes = await fetch('/api/contest/submit', {
@@ -497,6 +672,62 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-black text-xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {uploading ? 'Uploading... 🚀' : success ? 'Submitted! ✅' : 'Submit Entry 🎉'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Vote Modal Component
+function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any) {
+  if (!entry) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl max-w-md w-full p-8 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        <div className="text-center mb-6">
+          <h2 className="text-4xl font-black mb-2">Vote for {entry.pupName}! ❤️</h2>
+          <p className="text-gray-600">Enter your email to cast your vote</p>
+        </div>
+
+        <div className="mb-6">
+          <img
+            src={entry.image}
+            alt={entry.pupName}
+            className="w-full h-48 object-cover rounded-2xl"
+          />
+          <p className="text-gray-700 italic mt-4">"{entry.caption}"</p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="block font-bold mb-2">Your Email *</label>
+            <input
+              type="email"
+              required
+              value={voterEmail}
+              onChange={(e) => setVoterEmail(e.target.value)}
+              className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
+              placeholder="you@example.com"
+            />
+            <p className="text-sm text-gray-500 mt-2">
+              We'll only use this to prevent duplicate votes. One vote per dog per email.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-black text-xl shadow-xl hover:shadow-2xl transition transform hover:scale-105"
+          >
+            Cast Your Vote! 🗳️
           </button>
         </form>
       </div>

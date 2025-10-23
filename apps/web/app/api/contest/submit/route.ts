@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pkg from 'pg';
 const { Pool } = pkg;
+import Filter from 'bad-words';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
+
+const filter = new Filter();
 
 /**
  * POST /api/contest/submit
@@ -28,6 +31,26 @@ export async function POST(request: NextRequest) {
     if (!pupName || !ownerName || !ownerEmail || !category || !caption || !photoUrl) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Check for profanity in public-facing fields
+    if (filter.isProfane(pupName)) {
+      return NextResponse.json(
+        { success: false, error: 'Dog name contains inappropriate language' },
+        { status: 400 }
+      );
+    }
+    if (filter.isProfane(caption)) {
+      return NextResponse.json(
+        { success: false, error: 'Caption contains inappropriate language' },
+        { status: 400 }
+      );
+    }
+    if (daycareName && filter.isProfane(daycareName)) {
+      return NextResponse.json(
+        { success: false, error: 'Daycare name contains inappropriate language' },
         { status: 400 }
       );
     }

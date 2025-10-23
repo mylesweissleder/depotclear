@@ -52,6 +52,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Upload error:', error);
+
+    // Check if it's a Vercel Blob error in local development
+    if (error.message?.includes('ENOTFOUND') || error.message?.includes('getaddrinfo')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Photo upload requires deployment to Vercel. For now, please use an image URL instead, or deploy the app to enable uploads.'
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to upload photo' },
       { status: 500 }
