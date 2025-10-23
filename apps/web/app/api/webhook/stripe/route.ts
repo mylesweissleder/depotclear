@@ -73,10 +73,10 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as any;
 
         // Update expiration date when subscription renews
-        const expiresAt = new Date((subscription.current_period_end as number) * 1000);
+        const expiresAt = new Date(subscription.current_period_end * 1000);
 
         await sql`
           UPDATE dog_daycares
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
 
         // Monthly renewal successful - extend premium
         if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          const expiresAt = new Date((subscription.current_period_end as number) * 1000);
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string) as any;
+          const expiresAt = new Date(subscription.current_period_end * 1000);
 
           await sql`
             UPDATE dog_daycares
