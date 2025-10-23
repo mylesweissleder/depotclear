@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as any;
 
         // Payment failed - mark as at risk but don't immediately downgrade
         // Stripe will retry, we'll only downgrade on subscription.deleted
