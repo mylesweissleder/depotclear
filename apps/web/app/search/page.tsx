@@ -200,7 +200,7 @@ function DaycareCard({ daycare }: { daycare: any }) {
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center gap-1">
               <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-              <span className="font-bold text-lg">{daycare.rating.toFixed(1)}</span>
+              <span className="font-bold text-lg">{parseFloat(daycare.rating).toFixed(1)}</span>
             </div>
             {daycare.review_count && (
               <span className="text-gray-500 text-sm">({daycare.review_count} reviews)</span>
