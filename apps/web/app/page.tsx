@@ -61,7 +61,7 @@ export default function HomePage() {
             <p className="text-xl md:text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
               The nation's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog care services!
               <br />
-              Compare ratings, read reviews, and find the perfect spot for your furry friend.
+              Compare ratings, check Google reviews, and find the perfect spot for your furry friend.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/search" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-black text-lg shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110">
@@ -260,12 +260,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <a
-            href="mailto:hello@woofhouses.com"
+          <Link
+            href="/claim"
             className="inline-block bg-yellow-400 text-gray-900 px-12 py-6 rounded-full font-black text-xl shadow-2xl hover:bg-yellow-300 transition transform hover:scale-110"
           >
             🎯 Claim Your Free Listing →
-          </a>
+          </Link>
           <p className="text-sm text-white/80 mt-6 font-semibold">
             ⏰ Limited to first 100 businesses • Premium features coming soon
           </p>
