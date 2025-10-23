@@ -16,7 +16,7 @@ export default function HomePage() {
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">
                   Woof Houses
                 </h1>
-                <p className="text-xs text-orange-600 font-semibold">🐾 Find the perfect playdate!</p>
+                <p className="text-xs text-orange-600 font-semibold">🐾 Daycare, Playdates, Boarding & More</p>
               </div>
             </div>
             <nav className="hidden md:flex space-x-8">
@@ -54,7 +54,7 @@ export default function HomePage() {
                 Woof! Find the
               </span>
               <br />
-              <span className="text-gray-900">Perfect Playdate</span>
+              <span className="text-gray-900">Perfect Dog Daycare</span>
               <br />
               <span className="text-orange-500">for Your Pup 🐾</span>
             </h2>
