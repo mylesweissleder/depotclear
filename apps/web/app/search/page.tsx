@@ -27,7 +27,10 @@ const bayAreaCities = [
 export default function SearchPage() {
   const [selectedCity, setSelectedCity] = useState('All');
   const [minRating, setMinRating] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'rating' | 'name' | 'reviews'>('rating');
   const [daycares, setDaycares] = useState<any[]>([]);
+  const [displayCount, setDisplayCount] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +43,7 @@ export default function SearchPage() {
       const params = new URLSearchParams({
         city: selectedCity,
         minRating: minRating.toString(),
-        limit: '500',
+        limit: '10000', // Load all results
       });
 
       const response = await fetch(`/api/daycares?${params}`);
@@ -70,7 +73,37 @@ export default function SearchPage() {
     fetchDaycares();
   }, [fetchDaycares]);
 
-  const daycareswithRatings = daycares.filter(d => d.rating && d.rating > 0);
+  // Filter by search query
+  const filteredDaycares = daycares.filter(daycare => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      daycare.name?.toLowerCase().includes(query) ||
+      daycare.address?.toLowerCase().includes(query) ||
+      daycare.city?.toLowerCase().includes(query)
+    );
+  });
+
+  // Sort daycares
+  const sortedDaycares = [...filteredDaycares].sort((a, b) => {
+    if (sortBy === 'rating') {
+      const ratingA = parseFloat(a.rating) || 0;
+      const ratingB = parseFloat(b.rating) || 0;
+      if (ratingB !== ratingA) return ratingB - ratingA; // Highest rating first
+      return (b.review_count || 0) - (a.review_count || 0); // Then by review count
+    } else if (sortBy === 'name') {
+      return (a.name || '').localeCompare(b.name || '');
+    } else if (sortBy === 'reviews') {
+      return (b.review_count || 0) - (a.review_count || 0);
+    }
+    return 0;
+  });
+
+  // Paginate results
+  const displayedDaycares = sortedDaycares.slice(0, displayCount);
+  const hasMore = displayCount < sortedDaycares.length;
+
+  const daycareswithRatings = filteredDaycares.filter(d => d.rating && d.rating > 0);
   const avgRating = daycareswithRatings.length > 0
     ? (daycareswithRatings.reduce((sum, d) => sum + parseFloat(d.rating), 0) / daycareswithRatings.length).toFixed(1)
     : '0.0';
@@ -88,10 +121,26 @@ export default function SearchPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Bar */}
+        {/* Search and Filter Bar */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+          {/* Name Search */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search by Name or Location</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="e.g. 'Woof Pack' or 'Market Street'"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -106,7 +155,8 @@ export default function SearchPage() {
                 </select>
               </div>
             </div>
-            <div className="flex-1">
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Minimum Rating: {minRating > 0 ? `${minRating}★` : 'Any'}
               </label>
@@ -124,19 +174,30 @@ export default function SearchPage() {
                 <span>5★</span>
               </div>
             </div>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              {daycares.length} daycares found
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                >
+                  <option value="rating">Highest Rating</option>
+                  <option value="reviews">Most Reviews</option>
+                  <option value="name">Name (A-Z)</option>
+                </select>
+              </div>
             </div>
-            <button
-              onClick={fetchDaycares}
-              disabled={isLoading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
-            >
-              <Search className="w-4 h-4" />
-              {isLoading ? 'Searching...' : 'Search'}
-            </button>
+          </div>
+
+          {/* Results Count */}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Showing {displayedDaycares.length} of {sortedDaycares.length} daycares
+              {sortedDaycares.length !== daycares.length && ` (filtered from ${daycares.length} total)`}
+            </div>
           </div>
           {error && (
             <div className="mt-3 text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
@@ -174,18 +235,32 @@ export default function SearchPage() {
             <h3 className="text-xl font-semibold text-gray-600 mb-2">Finding daycares...</h3>
             <p className="text-gray-500">Searching across the Bay Area</p>
           </div>
-        ) : daycares.length === 0 ? (
+        ) : sortedDaycares.length === 0 ? (
           <div className="bg-white rounded-lg p-12 text-center">
             <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">No daycares found</h3>
-            <p className="text-gray-500">Try adjusting your filters or selecting a different city</p>
+            <p className="text-gray-500">Try adjusting your filters or search query</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {daycares.map(daycare => (
-              <DaycareCard key={daycare.id} daycare={daycare} />
-            ))}
-          </div>
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedDaycares.map(daycare => (
+                <DaycareCard key={daycare.id} daycare={daycare} />
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setDisplayCount(prev => prev + 50)}
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
+                >
+                  Load More ({sortedDaycares.length - displayCount} remaining)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
