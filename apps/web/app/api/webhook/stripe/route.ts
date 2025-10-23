@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as any;
 
         // Monthly renewal successful - extend premium
         if (invoice.subscription) {
