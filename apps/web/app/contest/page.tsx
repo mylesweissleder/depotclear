@@ -272,6 +272,11 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
     caption: '',
     daycareName: '',
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const categories = [
     { value: 'goofiest-face', label: '🤪 Goofiest Face (Real Photos Only)' },
@@ -283,11 +288,69 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
     { value: 'ai-dog', label: '🤖 AI Dog (AI-Generated ONLY!)' },
   ];
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement photo upload and submission
-    alert('Photo submission will be implemented!');
-    onClose();
+    setError('');
+
+    if (!selectedFile) {
+      setError('Please select a photo to upload');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // 1. Upload photo to Vercel Blob
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', selectedFile);
+
+      const uploadRes = await fetch('/api/contest/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!uploadRes.ok) {
+        const uploadError = await uploadRes.json();
+        throw new Error(uploadError.error || 'Failed to upload photo');
+      }
+
+      const { url: photoUrl } = await uploadRes.json();
+
+      // 2. Submit contest entry
+      const submitRes = await fetch('/api/contest/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          photoUrl,
+        }),
+      });
+
+      if (!submitRes.ok) {
+        const submitError = await submitRes.json();
+        throw new Error(submitError.error || 'Failed to submit entry');
+      }
+
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+
+    } catch (err: any) {
+      console.error('Submission error:', err);
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -380,12 +443,47 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          <div className="border-4 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition cursor-pointer">
-            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="font-bold text-lg mb-2">Upload Photo</p>
-            <p className="text-gray-600 text-sm">Click to browse or drag and drop</p>
-            <p className="text-gray-500 text-xs mt-2">Max file size: 10MB • JPG, PNG, GIF</p>
+          <div>
+            <label className="block font-bold mb-2">Photo * {previewUrl && '✅'}</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={handleFileSelect}
+              className="hidden"
+              id="photo-upload"
+              required
+            />
+            <label
+              htmlFor="photo-upload"
+              className="block border-4 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition cursor-pointer"
+            >
+              {previewUrl ? (
+                <div className="space-y-4">
+                  <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg" />
+                  <p className="text-purple-600 font-bold">Click to change photo</p>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p className="font-bold text-lg mb-2">Upload Photo</p>
+                  <p className="text-gray-600 text-sm">Click to browse or drag and drop</p>
+                  <p className="text-gray-500 text-xs mt-2">Max file size: 10MB • JPG, PNG, GIF, WebP</p>
+                </>
+              )}
+            </label>
           </div>
+
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-700">
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-green-700">
+              <strong>Success!</strong> Your submission has been received and will be reviewed within 24 hours. 🎉
+            </div>
+          )}
 
           <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-4">
             <p className="text-sm text-gray-700">
@@ -395,9 +493,10 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-black text-xl shadow-xl hover:shadow-2xl transition transform hover:scale-105"
+            disabled={uploading || success}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-black text-xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            Submit Entry 🎉
+            {uploading ? 'Uploading... 🚀' : success ? 'Submitted! ✅' : 'Submit Entry 🎉'}
           </button>
         </form>
       </div>
