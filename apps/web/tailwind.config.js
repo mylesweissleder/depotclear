@@ -8,8 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'depot-orange': '#F96302',
-        'depot-dark': '#1A1A1A',
+        'pup-orange': '#F97316',
+        'pup-pink': '#EC4899',
+        'pup-purple': '#A855F7',
       },
     },
   },

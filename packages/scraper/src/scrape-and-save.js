@@ -86,7 +86,7 @@ async function main() {
     console.log('🏠 Starting Home Depot clearance scraper...\n');
 
     for (const category of categories) {
-      const items = await scraper.scrapeCategory(category, 5); // 5 pages for more items
+      const items = await scraper.scrapeCategory(category, 10); // 10 pages for more breadth
       allProducts.push(...items);
     }
 

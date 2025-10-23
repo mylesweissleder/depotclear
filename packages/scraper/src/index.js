@@ -207,9 +207,20 @@ class HomeDepotScraper {
             const linkElem = pod.querySelector('a[href*="/p/"]');
             const url = linkElem ? linkElem.href : '';
 
+            // Extract SKU from URL (/p/Product-Name/SKU)
+            let sku = null;
+            if (url) {
+              const skuMatch = url.match(/\/p\/[^\/]+\/(\d+)/);
+              if (skuMatch) sku = skuMatch[1];
+            }
+
             // Find image
             const imgElem = pod.querySelector('img');
             const imageUrl = imgElem ? imgElem.src : null;
+
+            // Try to find model number in text
+            const modelMatch = text.match(/Model[#:\s]+([A-Z0-9-]+)/i);
+            const modelNumber = modelMatch ? modelMatch[1] : null;
 
             if (priceMatch && title) {
               const dollars = priceMatch[1] + (priceMatch[2] || '');
@@ -235,7 +246,8 @@ class HomeDepotScraper {
                   category: cat,
                   isClearancePrice: true,
                   isPennyDealPrice,
-                  modelNumber: null,
+                  modelNumber: modelNumber || sku,
+                  sku: sku,
                   url,
                   imageUrl,
                   scrapedAt: new Date().toISOString(),

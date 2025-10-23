@@ -1,225 +1,262 @@
-import { Search, MapPin, Zap, DollarSign, Tag, TrendingDown, Flame, Clock } from 'lucide-react';
+import { Search, MapPin, Award, Heart, Filter, Star, Shield, Sparkles, PartyPopper, Dog } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white/80 backdrop-blur-sm border-b-4 border-orange-300 sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Tag className="w-8 h-8 text-depot-orange" />
-              <h1 className="text-2xl font-bold text-depot-dark">DepotClear</h1>
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-3 rounded-2xl shadow-lg transform -rotate-12">
+                <Dog className="w-8 h-8 text-white transform rotate-12" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+                  Bay Area Dog Daycare
+                </h1>
+                <p className="text-xs text-orange-600 font-semibold">🐾 Find the perfect playdate!</p>
+              </div>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-depot-orange">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-depot-orange">Pricing</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-depot-orange">How It Works</a>
+              <a href="#features" className="text-gray-700 hover:text-orange-500 font-semibold">Features</a>
+              <a href="#how-it-works" className="text-gray-700 hover:text-orange-500 font-semibold">How It Works</a>
+              <a href="#for-businesses" className="text-gray-700 hover:text-orange-500 font-semibold">List Your Business</a>
             </nav>
-            <Link href="/search" className="bg-depot-orange text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition">
-              Start Searching
+            <Link href="/search" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full hover:shadow-xl transition transform hover:scale-105 font-bold">
+              🐕 Find Daycare
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-depot-dark via-gray-900 to-depot-orange text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-5xl font-bold mb-6">
-              Find Hidden Home Depot Clearance Deals
-              <span className="block text-depot-orange mt-2">Nationwide</span>
+      <section className="relative overflow-hidden py-20">
+        {/* Fun background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 text-6xl animate-bounce">🐕</div>
+          <div className="absolute top-20 right-20 text-5xl animate-pulse">🦴</div>
+          <div className="absolute bottom-20 left-20 text-4xl">🐾</div>
+          <div className="absolute bottom-10 right-10 text-6xl animate-bounce delay-75">🐶</div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-block mb-4">
+              <span className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold animate-pulse">
+                🎉 100% Free for Pet Parents!
+              </span>
+            </div>
+            <h2 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                Woof! Find the
+              </span>
+              <br />
+              <span className="text-gray-900">Perfect Playdate</span>
+              <br />
+              <span className="text-orange-500">for Your Pup 🐾</span>
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              AI-powered clearance finder that tracks items under $1, ending in .01/.03/.06, and local store availability in real-time.
+            <p className="text-xl md:text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
+              The Bay Area's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog daycares!
+              <br />
+              Compare ratings, read reviews, and find the perfect spot for your furry friend.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/search" className="bg-white text-depot-dark px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition text-lg">
-                Try Free Demo
+              <Link href="/search" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-black text-lg shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110">
+                🔍 Browse All Daycares →
               </Link>
-              <a href="#pricing" className="bg-depot-orange border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition text-lg">
-                Get Lifetime Access - $20
+              <a href="#for-businesses" className="bg-white border-4 border-orange-500 text-orange-600 px-10 py-5 rounded-full font-black text-lg shadow-xl hover:bg-orange-50 transition transform hover:scale-110">
+                💼 List Your Business (Free!)
               </a>
             </div>
-            <p className="text-sm text-gray-400 mt-4">One-time payment. No subscriptions. Lifetime updates.</p>
+            <p className="text-sm text-gray-600 mt-6 font-semibold">
+              ✨ No signup required • 60+ verified daycares • Updated daily
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Penny Deals Section - NEW! */}
-      <section className="py-16 bg-gradient-to-r from-red-50 to-orange-50 border-y border-orange-200">
+      {/* Quick Stats */}
+      <section className="py-16 bg-white/60 backdrop-blur border-y-4 border-orange-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Flame className="w-4 h-4" />
-              LIVE PENNY DEALS
+          <div className="grid md:grid-cols-4 gap-8">
+            <StatCard emoji="🏆" number="60+" label="Verified Daycares" color="orange" />
+            <StatCard emoji="📍" number="9" label="Bay Area Counties" color="pink" />
+            <StatCard emoji="⭐" number="4.6★" label="Average Rating" color="yellow" />
+            <StatCard emoji="🎁" number="Free" label="For Pet Owners" color="green" />
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Daycares */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold mb-4 transform -rotate-2">
+              ⭐ MOST LOVED
             </div>
-            <h3 className="text-3xl font-bold mb-2">🔥 Hot Deals Found Near You</h3>
-            <p className="text-gray-600">We scan 2,300 stores nationwide every 6 hours to find these crazy deals</p>
+            <h3 className="text-5xl font-black mb-3 text-gray-900">
+              Top-Rated Tail-Waggers! 🐕
+            </h3>
+            <p className="text-xl text-gray-600">These spots have Bay Area dogs doing happy dances!</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <PennyDealCard
-              storeName="Home Depot - Pasadena"
-              distance="2.3 miles"
-              itemTitle="LED Work Light 1000 Lumens"
-              price="$0.03"
-              originalPrice="$29.99"
-              category="Lighting"
-              foundAgo="2 hours ago"
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <FunDaycareCard
+              name="Pet Camp San Francisco"
+              city="San Francisco"
+              rating={4.7}
+              reviews={856}
+              badge="🎪 Most Fun"
+              color="orange"
             />
-            <PennyDealCard
-              storeName="Home Depot - Glendale"
-              distance="4.1 miles"
-              itemTitle="Cordless Drill Battery Pack 18V"
-              price="$0.01"
-              originalPrice="$49.99"
-              category="Tools"
-              foundAgo="45 minutes ago"
-              isPenny={true}
+            <FunDaycareCard
+              name="Embarkadero Social Club"
+              city="San Francisco"
+              rating={4.9}
+              reviews={342}
+              badge="💎 Premium Pick"
+              color="purple"
             />
-            <PennyDealCard
-              storeName="Home Depot - Burbank"
-              distance="6.8 miles"
-              itemTitle="Exterior Paint Gallon - Gray"
-              price="$0.88"
-              originalPrice="$34.99"
-              category="Paint"
-              foundAgo="3 hours ago"
+            <FunDaycareCard
+              name="Bark Avenue"
+              city="San Francisco"
+              rating={4.6}
+              reviews={521}
+              badge="💰 Best Value"
+              color="green"
             />
           </div>
 
           <div className="text-center">
-            <Link href="/search" className="inline-block bg-depot-orange text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
-              Find Penny Deals Near You →
+            <Link href="/search" className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-black text-xl shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110">
+              <Dog className="w-6 h-6" />
+              See All Daycares
+              <span className="text-2xl">→</span>
             </Link>
-            <p className="text-sm text-gray-500 mt-3">Enter your ZIP code to see live deals at your local stores</p>
-          </div>
-
-          <div className="mt-12 bg-white rounded-lg p-6 shadow-sm">
-            <div className="grid md:grid-cols-4 gap-6 text-center">
-              <div>
-                <div className="text-3xl font-bold text-depot-orange">2,300</div>
-                <div className="text-sm text-gray-600 mt-1">Stores Monitored</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-depot-orange">Every 6h</div>
-                <div className="text-sm text-gray-600 mt-1">Update Frequency</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-depot-orange">1,247</div>
-                <div className="text-sm text-gray-600 mt-1">Deals Found Today</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-depot-orange">$42k</div>
-                <div className="text-sm text-gray-600 mt-1">Saved by Users</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-20 bg-white/60 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl font-bold text-center mb-12">Why DepotClear?</h3>
+          <div className="text-center mb-16">
+            <h3 className="text-5xl font-black mb-4 text-gray-900">Why Pet Parents Love Us! 🐾</h3>
+            <p className="text-xl text-gray-600">Finding the perfect daycare should be easy-peasy!</p>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Search className="w-10 h-10 text-depot-orange" />}
-              title="Smart Scraping"
-              description="Continuously monitors Home Depot's entire catalog for clearance items nationwide."
+            <FunFeatureCard
+              emoji="🔍"
+              title="Super Easy Search"
+              description="Browse daycares across all 9 Bay Area counties. Filter by city, rating, and more!"
+              color="orange"
             />
-            <FeatureCard
-              icon={<MapPin className="w-10 h-10 text-depot-orange" />}
-              title="Local Availability"
-              description="Enter your ZIP code and see what's in stock at nearby stores instantly."
+            <FunFeatureCard
+              emoji="⭐"
+              title="Real Reviews"
+              description="Read honest reviews from real pet parents in your neighborhood."
+              color="yellow"
             />
-            <FeatureCard
-              icon={<Zap className="w-10 h-10 text-depot-orange" />}
-              title="Real-Time Updates"
-              description="Automated refresh every 6 hours ensures you never miss a hot deal."
+            <FunFeatureCard
+              emoji="🎯"
+              title="Smart Filters"
+              description="Find exactly what you need - by size, breed, amenities, and price."
+              color="pink"
             />
-            <FeatureCard
-              icon={<DollarSign className="w-10 h-10 text-depot-orange" />}
-              title="Price Intelligence"
-              description="Flags items under $1 and clearance markers (.01, .03, .06, .88, .99)."
+            <FunFeatureCard
+              emoji="📍"
+              title="Near You"
+              description="Search by city to find convenient options close to home or work."
+              color="green"
             />
-            <FeatureCard
-              icon={<TrendingDown className="w-10 h-10 text-depot-orange" />}
-              title="AI Insights"
-              description="GPT-powered trend analysis shows which categories have the most deals."
+            <FunFeatureCard
+              emoji="🛡️"
+              title="Verified & Safe"
+              description="All listed businesses are checked for proper licensing and insurance."
+              color="blue"
             />
-            <FeatureCard
-              icon={<Tag className="w-10 h-10 text-depot-orange" />}
-              title="Category Filters"
-              description="Browse by Tools, Lighting, Paint, Hardware, Outdoor, and more."
+            <FunFeatureCard
+              emoji="💯"
+              title="100% Free"
+              description="No hidden fees, no subscriptions, no gimmicks. Just happy dogs!"
+              color="purple"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl font-bold text-center mb-4">Simple, One-Time Pricing</h3>
-          <p className="text-center text-gray-600 mb-12">Pay once, use forever. No recurring fees.</p>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8 border-4 border-depot-orange">
-            <div className="text-center">
-              <h4 className="text-2xl font-bold mb-2">DepotClear Lifetime</h4>
-              <div className="flex items-baseline justify-center mb-6">
-                <span className="text-5xl font-bold text-depot-orange">$20</span>
-                <span className="text-gray-500 ml-2">one-time</span>
-              </div>
-              <ul className="text-left space-y-4 mb-8">
-                <PricingFeature text="Unlimited clearance searches" />
-                <PricingFeature text="Nationwide store availability" />
-                <PricingFeature text="Real-time price tracking" />
-                <PricingFeature text="AI-powered deal insights" />
-                <PricingFeature text="Category filters & sorting" />
-                <PricingFeature text="Lifetime updates & support" />
-                <PricingFeature text="No monthly fees ever" />
-              </ul>
-              <Link href="/checkout" className="block w-full bg-depot-orange text-white py-4 rounded-lg font-semibold hover:bg-orange-600 transition text-lg">
-                Get Lifetime Access Now
-              </Link>
-              <p className="text-sm text-gray-500 mt-4">Secure payment via Stripe • 7-day money-back guarantee</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <Link href="/search" className="text-depot-orange hover:underline">
-              Or try the free demo first →
-            </Link>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl font-bold text-center mb-12">How It Works</h3>
+          <div className="text-center mb-16">
+            <h3 className="text-5xl font-black mb-4 text-gray-900">How It Works 🚀</h3>
+            <p className="text-xl text-gray-600">Four easy steps to doggy paradise!</p>
+          </div>
           <div className="grid md:grid-cols-4 gap-8">
-            <StepCard number="1" title="Enter ZIP Code" description="Tell us where you want to shop" />
-            <StepCard number="2" title="Browse Deals" description="View clearance items sorted by price and category" />
-            <StepCard number="3" title="Check Availability" description="See real-time stock at nearby stores" />
-            <StepCard number="4" title="Go Shopping" description="Head to the store and grab your deals!" />
+            <FunStepCard number="1" emoji="🔍" title="Search" description="Pick your city or browse all" />
+            <FunStepCard number="2" emoji="📊" title="Compare" description="Read reviews & check ratings" />
+            <FunStepCard number="3" emoji="📞" title="Contact" description="Call or visit for a tour" />
+            <FunStepCard number="4" emoji="🎉" title="Celebrate!" description="Watch your pup make friends!" />
           </div>
         </div>
       </section>
 
+      {/* For Businesses */}
+      <section id="for-businesses" className="py-20 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-500 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 text-8xl">💼</div>
+          <div className="absolute bottom-10 right-10 text-8xl">🐕</div>
+        </div>
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-block bg-yellow-400 text-gray-900 px-6 py-2 rounded-full text-sm font-bold mb-6">
+            🎁 LIMITED TIME OFFER
+          </div>
+          <h3 className="text-5xl md:text-6xl font-black mb-6">Own a Dog Daycare?</h3>
+          <p className="text-2xl mb-8 leading-relaxed">
+            List your business <span className="bg-yellow-400 text-gray-900 px-3 py-1 rounded-lg font-black">FREE</span> during our beta!
+            <br />
+            Get discovered by thousands of local pet parents.
+          </p>
+
+          <div className="bg-white text-gray-900 rounded-3xl p-10 mb-10 shadow-2xl transform hover:scale-105 transition">
+            <h4 className="text-3xl font-black mb-8">🎉 Free Beta Listing Includes:</h4>
+            <div className="grid md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
+              <BizFeature emoji="📸" text="Full profile with photos" />
+              <BizFeature emoji="📞" text="Direct contact info" />
+              <BizFeature emoji="⭐" text="Customer reviews & ratings" />
+              <BizFeature emoji="✨" text="Amenities showcase" />
+              <BizFeature emoji="🚀" text="Priority placement" />
+              <BizFeature emoji="📊" text="Analytics dashboard" />
+            </div>
+          </div>
+
+          <a
+            href="mailto:hello@bayareadogdaycare.com"
+            className="inline-block bg-yellow-400 text-gray-900 px-12 py-6 rounded-full font-black text-xl shadow-2xl hover:bg-yellow-300 transition transform hover:scale-110"
+          >
+            🎯 Claim Your Free Listing →
+          </a>
+          <p className="text-sm text-white/80 mt-6 font-semibold">
+            ⏰ Limited to first 100 businesses • Premium features coming soon
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-depot-dark text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 border-t-4 border-orange-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Tag className="w-6 h-6" />
-              <span className="font-semibold">DepotClear</span>
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+              <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
+                <Dog className="w-6 h-6 text-white" />
+              </div>
+              <span className="font-black text-lg">Bay Area Dog Daycare</span>
             </div>
             <p className="text-gray-400 text-sm">
-              © 2025 DepotClear. Not affiliated with The Home Depot, Inc.
+              © 2025 Made with 🐾 and ❤️ for SF Bay Area dogs
             </p>
           </div>
         </div>
@@ -228,100 +265,106 @@ export default function HomePage() {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <div className="p-6 rounded-lg border border-gray-200 hover:border-depot-orange transition">
-      <div className="mb-4">{icon}</div>
-      <h4 className="text-xl font-semibold mb-2">{title}</h4>
-      <p className="text-gray-600">{description}</p>
-    </div>
-  );
-}
+function StatCard({ emoji, number, label, color }: { emoji: string; number: string; label: string; color: string }) {
+  const colors: Record<string, string> = {
+    orange: 'from-orange-400 to-pink-500',
+    pink: 'from-pink-400 to-purple-500',
+    yellow: 'from-yellow-400 to-orange-500',
+    green: 'from-green-400 to-teal-500',
+  };
 
-function PricingFeature({ text }: { text: string }) {
   return (
-    <li className="flex items-center">
-      <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-      </svg>
-      <span>{text}</span>
-    </li>
-  );
-}
-
-function StepCard({ number, title, description }: { number: string; title: string; description: string }) {
-  return (
-    <div className="text-center">
-      <div className="w-16 h-16 bg-depot-orange text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+    <div className="text-center transform hover:scale-110 transition">
+      <div className={`text-5xl mb-3 animate-bounce`}>{emoji}</div>
+      <div className={`text-4xl font-black bg-gradient-to-r ${colors[color]} bg-clip-text text-transparent mb-2`}>
         {number}
       </div>
-      <h4 className="text-lg font-semibold mb-2">{title}</h4>
-      <p className="text-gray-600 text-sm">{description}</p>
+      <div className="text-sm text-gray-700 font-semibold">{label}</div>
     </div>
   );
 }
 
-function PennyDealCard({
-  storeName,
-  distance,
-  itemTitle,
-  price,
-  originalPrice,
-  category,
-  foundAgo,
-  isPenny = false,
-}: {
-  storeName: string;
-  distance: string;
-  itemTitle: string;
-  price: string;
-  originalPrice: string;
-  category: string;
-  foundAgo: string;
-  isPenny?: boolean;
-}) {
-  const discount = Math.round(((parseFloat(originalPrice.replace('$', '')) - parseFloat(price.replace('$', ''))) / parseFloat(originalPrice.replace('$', ''))) * 100);
+function FunFeatureCard({ emoji, title, description, color }: { emoji: string; title: string; description: string; color: string }) {
+  const colors: Record<string, string> = {
+    orange: 'from-orange-400 to-pink-500',
+    yellow: 'from-yellow-400 to-orange-500',
+    pink: 'from-pink-400 to-purple-500',
+    green: 'from-green-400 to-teal-500',
+    blue: 'from-blue-400 to-indigo-500',
+    purple: 'from-purple-400 to-pink-500',
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden border-2 border-orange-200">
-      {isPenny && (
-        <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 text-center font-bold text-sm">
-          🎉 PENNY DEAL! 🎉
-        </div>
-      )}
-      <div className="p-5">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-              <MapPin className="w-4 h-4" />
-              <span>{storeName}</span>
-            </div>
-            <div className="text-xs text-gray-500">{distance}</div>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <Clock className="w-3 h-3" />
-            <span>{foundAgo}</span>
-          </div>
-        </div>
+    <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 border-4 border-transparent hover:border-orange-300">
+      <div className="text-6xl mb-4">{emoji}</div>
+      <h4 className={`text-2xl font-black mb-3 bg-gradient-to-r ${colors[color]} bg-clip-text text-transparent`}>
+        {title}
+      </h4>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
+    </div>
+  );
+}
 
-        <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{itemTitle}</h4>
-
-        <div className="inline-block bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium mb-3">
-          {category}
+function FunStepCard({ number, emoji, title, description }: { number: string; emoji: string; title: string; description: string }) {
+  return (
+    <div className="text-center">
+      <div className="relative inline-block mb-4">
+        <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-4xl font-black text-white shadow-2xl transform hover:scale-110 transition">
+          {number}
         </div>
-
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl font-bold text-red-600">{price}</span>
-          <span className="text-sm text-gray-500 line-through">{originalPrice}</span>
-          <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
-            -{discount}%
-          </span>
-        </div>
-
-        <div className="text-sm text-gray-700 font-medium">
-          Save {(parseFloat(originalPrice.replace('$', '')) - parseFloat(price.replace('$', ''))).toFixed(2)}
-        </div>
+        <div className="absolute -top-2 -right-2 text-4xl animate-bounce">{emoji}</div>
       </div>
+      <h4 className="text-2xl font-black mb-2 text-gray-900">{title}</h4>
+      <p className="text-gray-600 font-medium">{description}</p>
+    </div>
+  );
+}
+
+function FunDaycareCard({ name, city, rating, reviews, badge, color }: { name: string; city: string; rating: number; reviews: number; badge: string; color: string }) {
+  const colors: Record<string, string> = {
+    orange: 'from-orange-400 to-pink-500',
+    purple: 'from-purple-400 to-pink-500',
+    green: 'from-green-400 to-teal-500',
+  };
+
+  return (
+    <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 overflow-hidden border-4 border-orange-200 hover:border-orange-400">
+      <div className={`h-3 bg-gradient-to-r ${colors[color]}`}></div>
+      <div className="p-8">
+        <div className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-xs font-bold mb-4 transform -rotate-2">
+          {badge}
+        </div>
+
+        <h4 className="font-black text-2xl mb-2 text-gray-900">{name}</h4>
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+          <MapPin className="w-4 h-4" />
+          <span className="font-semibold">{city}</span>
+        </div>
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-1">
+            <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+            <span className="font-black text-2xl">{rating}</span>
+          </div>
+          <span className="text-gray-500 font-semibold">({reviews} reviews)</span>
+        </div>
+
+        <Link
+          href="/search"
+          className={`block w-full bg-gradient-to-r ${colors[color]} text-white text-center py-4 rounded-2xl font-black shadow-lg hover:shadow-xl transition transform hover:scale-105`}
+        >
+          View Details →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function BizFeature({ emoji, text }: { emoji: string; text: string }) {
+  return (
+    <div className="flex items-center gap-3 text-left">
+      <span className="text-3xl">{emoji}</span>
+      <span className="font-semibold text-lg">{text}</span>
     </div>
   );
 }
