@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, MapPin, Filter, Heart, Star, Phone, Globe, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,7 +20,7 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch daycares from API
-  const fetchDaycares = async () => {
+  const fetchDaycares = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -51,12 +51,12 @@ export default function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedCity, minRating]);
 
   // Load daycares on mount and when filters change
   useEffect(() => {
     fetchDaycares();
-  }, [selectedCity, minRating]);
+  }, [fetchDaycares]);
 
   const avgRating = daycares.length > 0
     ? (daycares.reduce((sum, d) => sum + (d.rating || 0), 0) / daycares.filter(d => d.rating).length).toFixed(1)
