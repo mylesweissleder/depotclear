@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pkg from 'pg';
 const { Pool } = pkg;
-import Filter from 'bad-words';
+import { Filter } from 'bad-words';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
