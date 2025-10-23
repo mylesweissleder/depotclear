@@ -7,12 +7,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 /**
  * POST /api/checkout
- * Creates a Stripe Checkout session for one-time payment
- * Using embedded checkout (like the sample code)
+ * Creates a Stripe Checkout session for premium listing upgrade
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, daycareId, plan = 'monthly' } = await request.json();
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
@@ -21,25 +20,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Debug: Check if keys are set
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('STRIPE_SECRET_KEY is not set');
+    if (!daycareId) {
       return NextResponse.json(
-        { success: false, error: 'Stripe configuration error - missing secret key' },
+        { success: false, error: 'Daycare ID required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate plan
+    const validPlans = ['monthly', 'annual'];
+    if (!validPlans.includes(plan)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid plan selected' },
+        { status: 400 }
+      );
+    }
+
+    // Premium pricing (set these in Stripe Dashboard and env vars)
+    const priceIds = {
+      monthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID,  // $99/month
+      annual: process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID,    // $990/year (17% discount)
+    };
+
+    const priceId = priceIds[plan as keyof typeof priceIds];
+
+    if (!priceId) {
+      console.error(`Missing price ID for plan: ${plan}`);
+      return NextResponse.json(
+        { success: false, error: 'Pricing configuration error' },
         { status: 500 }
       );
     }
 
-    if (!process.env.STRIPE_PRICE_ID) {
-      console.error('STRIPE_PRICE_ID is not set');
-      return NextResponse.json(
-        { success: false, error: 'Stripe configuration error - missing price ID' },
-        { status: 500 }
-      );
-    }
-
-    console.log('Creating checkout session for:', email);
-    console.log('Using price ID:', process.env.STRIPE_PRICE_ID);
+    console.log('Creating premium upgrade session for:', email, 'Plan:', plan);
 
     // Create embedded checkout session
     const session = await stripe.checkout.sessions.create({
@@ -47,18 +60,20 @@ export async function POST(request: NextRequest) {
       customer_email: email,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID,
+          price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      mode: plan === 'monthly' ? 'subscription' : 'payment',
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         email: email,
+        daycareId: daycareId.toString(),
+        plan: plan,
       },
     });
 
-    console.log('Checkout session created successfully:', session.id);
+    console.log('Checkout session created:', session.id);
 
     return NextResponse.json({
       success: true,
@@ -67,7 +82,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Checkout error:', error);
-    console.error('Error details:', error.message);
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to create checkout session' },
       { status: 500 }

@@ -14,12 +14,13 @@ export default function HomePage() {
               </div>
               <div>
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-                  Bay Area Dog Daycare
+                  Woof Houses
                 </h1>
                 <p className="text-xs text-orange-600 font-semibold">🐾 Find the perfect playdate!</p>
               </div>
             </div>
             <nav className="hidden md:flex space-x-8">
+              <Link href="/contest" className="text-purple-600 hover:text-purple-700 font-black animate-pulse">🏆 Contest</Link>
               <a href="#features" className="text-gray-700 hover:text-orange-500 font-semibold">Features</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-orange-500 font-semibold">How It Works</a>
               <a href="#for-businesses" className="text-gray-700 hover:text-orange-500 font-semibold">List Your Business</a>
@@ -58,7 +59,7 @@ export default function HomePage() {
               <span className="text-orange-500">for Your Pup 🐾</span>
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
-              The Bay Area's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog daycares!
+              The nation's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog daycares!
               <br />
               Compare ratings, read reviews, and find the perfect spot for your furry friend.
             </p>
@@ -71,9 +72,32 @@ export default function HomePage() {
               </a>
             </div>
             <p className="text-sm text-gray-600 mt-6 font-semibold">
-              ✨ No signup required • 60+ verified daycares • Updated daily
+              ✨ No signup required • 5,000+ verified daycares • Updated daily
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Viral Contest Banner */}
+      <section className="py-8 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-2 left-10 text-6xl animate-bounce">🏆</div>
+          <div className="absolute top-2 right-10 text-6xl animate-bounce delay-75">😂</div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+          <div className="inline-block bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-xs font-black mb-3 animate-pulse">
+            NEW MONTHLY CONTEST!
+          </div>
+          <h3 className="text-4xl md:text-5xl font-black mb-3">
+            🤪 Dogs Doing Ridiculous Things Contest
+          </h3>
+          <p className="text-xl mb-4">Submit your pup's funniest photo & win $500! 💰</p>
+          <Link
+            href="/contest"
+            className="inline-block bg-white text-purple-600 px-8 py-3 rounded-full font-black text-lg shadow-2xl hover:bg-yellow-400 hover:text-gray-900 transition transform hover:scale-110"
+          >
+            Enter Contest →
+          </Link>
         </div>
       </section>
 
@@ -81,8 +105,8 @@ export default function HomePage() {
       <section className="py-16 bg-white/60 backdrop-blur border-y-4 border-orange-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
-            <StatCard emoji="🏆" number="60+" label="Verified Daycares" color="orange" />
-            <StatCard emoji="📍" number="9" label="Bay Area Counties" color="pink" />
+            <StatCard emoji="🏆" number="5,000+" label="Verified Daycares" color="orange" />
+            <StatCard emoji="📍" number="4" label="Major Metro Areas" color="pink" />
             <StatCard emoji="⭐" number="4.6★" label="Average Rating" color="yellow" />
             <StatCard emoji="🎁" number="Free" label="For Pet Owners" color="green" />
           </div>
@@ -99,7 +123,7 @@ export default function HomePage() {
             <h3 className="text-5xl font-black mb-3 text-gray-900">
               Top-Rated Tail-Waggers! 🐕
             </h3>
-            <p className="text-xl text-gray-600">These spots have Bay Area dogs doing happy dances!</p>
+            <p className="text-xl text-gray-600">These spots have dogs doing happy dances across the country!</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -150,7 +174,7 @@ export default function HomePage() {
             <FunFeatureCard
               emoji="🔍"
               title="Super Easy Search"
-              description="Browse daycares across all 9 Bay Area counties. Filter by city, rating, and more!"
+              description="Browse daycares across major US metros. Filter by city, rating, and more!"
               color="orange"
             />
             <FunFeatureCard
@@ -218,7 +242,7 @@ export default function HomePage() {
           <p className="text-2xl mb-8 leading-relaxed">
             List your business <span className="bg-yellow-400 text-gray-900 px-3 py-1 rounded-lg font-black">FREE</span> during our beta!
             <br />
-            Get discovered by thousands of local pet parents.
+            Get discovered by thousands of pet parents nationwide.
           </p>
 
           <div className="bg-white text-gray-900 rounded-3xl p-10 mb-10 shadow-2xl transform hover:scale-105 transition">
@@ -234,7 +258,7 @@ export default function HomePage() {
           </div>
 
           <a
-            href="mailto:hello@bayareadogdaycare.com"
+            href="mailto:hello@woofhouses.com"
             className="inline-block bg-yellow-400 text-gray-900 px-12 py-6 rounded-full font-black text-xl shadow-2xl hover:bg-yellow-300 transition transform hover:scale-110"
           >
             🎯 Claim Your Free Listing →
@@ -253,10 +277,10 @@ export default function HomePage() {
               <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
                 <Dog className="w-6 h-6 text-white" />
               </div>
-              <span className="font-black text-lg">Bay Area Dog Daycare</span>
+              <span className="font-black text-lg">Woof Houses</span>
             </div>
             <p className="text-gray-400 text-sm">
-              © 2025 Made with 🐾 and ❤️ for SF Bay Area dogs
+              © 2025 Made with 🐾 and ❤️ for dogs everywhere
             </p>
           </div>
         </div>
