@@ -19,6 +19,8 @@ export async function POST(request: NextRequest) {
       category,
       caption,
       daycareName,
+      city,
+      state,
       photoUrl,
     } = body;
 
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
       INSERT INTO pup_submissions (
         pup_name, owner_name, owner_email, daycare_name,
         photo_url, caption, category, is_ai_generated,
-        contest_month, status
+        contest_month, status, city, state
       ) VALUES (
         ${pupName},
         ${ownerName},
@@ -104,7 +106,9 @@ export async function POST(request: NextRequest) {
         ${category},
         ${isAiGenerated},
         ${contestMonth},
-        ${'pending'}
+        ${'pending'},
+        ${city || null},
+        ${state || null}
       )
       RETURNING id
     `;

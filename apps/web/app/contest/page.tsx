@@ -432,7 +432,7 @@ export default function ContestPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✓</span>
-                <span><strong>Browser fingerprinting</strong> - VPNs and bot votes detected & removed</span>
+                <span><strong>Rate limiting</strong> - Maximum 10 votes per IP per hour</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✗</span>
@@ -554,6 +554,8 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
     category: 'goofiest-face',
     caption: '',
     daycareName: '',
+    city: '',
+    state: '',
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -719,6 +721,79 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
               className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
               placeholder="Where does your pup go to daycare?"
             />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-bold mb-2">City (Optional)</label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
+                placeholder="San Francisco"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-2">State (Optional)</label>
+              <select
+                value={formData.state}
+                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
+              >
+                <option value="">Select state...</option>
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+            </div>
           </div>
 
           <div>

@@ -199,12 +199,6 @@ export default function HomePage() {
               color="green"
             />
             <FunFeatureCard
-              emoji="🛡️"
-              title="Verified & Safe"
-              description="All listed businesses are checked for proper licensing and insurance."
-              color="blue"
-            />
-            <FunFeatureCard
               emoji="💯"
               title="100% Free"
               description="No hidden fees, no subscriptions, no gimmicks. Just happy dogs!"
