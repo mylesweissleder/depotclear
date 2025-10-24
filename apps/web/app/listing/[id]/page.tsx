@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { sql } from '@vercel/postgres';
 import { MapPin, Star, Phone, Globe, ExternalLink, ArrowLeft } from 'lucide-react';
 
-export default async function ListingPage({ params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: idStr } = await params;
+  const id = parseInt(idStr);
 
   if (isNaN(id)) {
     notFound();
