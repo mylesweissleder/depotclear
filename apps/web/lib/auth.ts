@@ -80,11 +80,11 @@ export async function createUser(email: string, password: string, name?: string,
 /**
  * Find user by email
  */
-export async function findUserByEmail(email: string) {
+export async function findUserByEmail(email: string): Promise<(User & { password_hash: string; role?: string }) | null> {
   const result = await sql`
     SELECT * FROM users WHERE email = ${email}
   `;
-  return result.rows[0] || null;
+  return result.rows[0] as (User & { password_hash: string; role?: string }) | null;
 }
 
 /**
