@@ -24,6 +24,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
   const daycare = result.rows[0];
 
+  // Check if website is actually a Google Maps URL (data quality issue)
+  const isWebsiteGoogleMaps = daycare.website && daycare.website.includes('google.com/maps');
+  const actualWebsite = isWebsiteGoogleMaps ? null : daycare.website;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50">
       {/* Header */}
@@ -76,11 +80,11 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                   </a>
                 </div>
               )}
-              {daycare.website && (
+              {actualWebsite && (
                 <div className="flex items-center gap-3">
                   <Globe className="w-5 h-5 text-orange-500" />
                   <a
-                    href={daycare.website}
+                    href={actualWebsite}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-lg hover:text-orange-500"
@@ -97,10 +101,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Primary CTA - Business Website */}
-            {daycare.website ? (
+            {actualWebsite ? (
               <div className="space-y-3">
                 <a
-                  href={daycare.website}
+                  href={actualWebsite}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
