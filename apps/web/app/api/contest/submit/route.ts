@@ -118,16 +118,33 @@ export async function POST(request: NextRequest) {
     // Add email to newsletter (for contest updates, winners, and featured daycares)
     // This opts them into monthly updates about contest entries, winners, and premium accounts
     const normalizedEmail = normalizeEmail(ownerEmail);
+    let isNewSubscriber = false;
     try {
-      await sql`
+      const insertResult = await sql`
         INSERT INTO newsletter_subscribers
         (email, normalized_email, source, ip_address, user_agent, subscribed)
         VALUES (${ownerEmail}, ${normalizedEmail}, 'contest_submission', ${ipAddress}, ${userAgent}, TRUE)
         ON CONFLICT (email) DO NOTHING
+        RETURNING id
       `;
+
+      // If a row was returned, this is a new subscriber
+      isNewSubscriber = insertResult.rows.length > 0;
     } catch (newsletterError) {
       // Don't fail the submission if newsletter insert fails
       console.error('Newsletter insert error (non-fatal):', newsletterError);
+    }
+
+    // Send welcome email to new subscribers (async, don't wait for it)
+    if (isNewSubscriber) {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/newsletter/welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: ownerEmail }),
+      }).catch(err => {
+        // Non-blocking - just log if it fails
+        console.error('Failed to send welcome email (non-fatal):', err);
+      });
     }
 
     console.log('Contest submission created:', {
