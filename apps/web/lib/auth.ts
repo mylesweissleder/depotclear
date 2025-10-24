@@ -11,6 +11,7 @@ export interface User {
   phone?: string;
   created_at: Date;
   email_verified: boolean;
+  role?: string;
 }
 
 export interface JWTPayload {
@@ -92,7 +93,7 @@ export async function findUserByEmail(email: string): Promise<(User & { password
  */
 export async function findUserById(id: number) {
   const result = await sql`
-    SELECT id, email, name, phone, created_at, email_verified, last_login_at
+    SELECT id, email, name, phone, created_at, email_verified, last_login_at, role
     FROM users
     WHERE id = ${id}
   `;
