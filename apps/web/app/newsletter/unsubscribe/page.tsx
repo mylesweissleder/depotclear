@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
@@ -86,5 +86,20 @@ export default function UnsubscribePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md w-full text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mx-auto mb-6"></div>
+          <h1 className="text-2xl font-black text-gray-900 mb-2">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <UnsubscribeContent />
+    </Suspense>
   );
 }
