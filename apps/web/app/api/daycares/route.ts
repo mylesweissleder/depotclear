@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at
         FROM dog_daycares
         WHERE region = ${region}
           AND city = ${city}
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at
         FROM dog_daycares
         WHERE region = ${region}
           AND city = ${city}
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at
         FROM dog_daycares
         WHERE region = ${region}
           AND rating >= ${minRating}
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at
         FROM dog_daycares
         WHERE region = ${region}
         ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST

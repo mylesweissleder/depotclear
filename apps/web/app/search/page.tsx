@@ -26,6 +26,7 @@ const bayAreaCities = [
 
 export default function SearchPage() {
   const [selectedCity, setSelectedCity] = useState('All');
+  const [selectedType, setSelectedType] = useState('all');
   const [minRating, setMinRating] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'rating' | 'name' | 'reviews'>('rating');
@@ -73,15 +74,26 @@ export default function SearchPage() {
     fetchDaycares();
   }, [fetchDaycares]);
 
-  // Filter by search query
+  // Filter by search query and business type
   const filteredDaycares = daycares.filter(daycare => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      daycare.name?.toLowerCase().includes(query) ||
-      daycare.address?.toLowerCase().includes(query) ||
-      daycare.city?.toLowerCase().includes(query)
-    );
+    // Search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = (
+        daycare.name?.toLowerCase().includes(query) ||
+        daycare.address?.toLowerCase().includes(query) ||
+        daycare.city?.toLowerCase().includes(query)
+      );
+      if (!matchesSearch) return false;
+    }
+
+    // Business type filter
+    if (selectedType !== 'all') {
+      const types = daycare.business_types || [];
+      if (!types.includes(selectedType)) return false;
+    }
+
+    return true;
   });
 
   // Sort daycares
@@ -139,7 +151,7 @@ export default function SearchPage() {
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
               <div className="relative">
@@ -152,6 +164,28 @@ export default function SearchPage() {
                   {bayAreaCities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                >
+                  <option value="all">All Types</option>
+                  <option value="daycare">🏠 Daycare</option>
+                  <option value="boarding">🛏️ Boarding</option>
+                  <option value="grooming">✂️ Grooming</option>
+                  <option value="training">🎓 Training</option>
+                  <option value="walking">🚶 Walking</option>
+                  <option value="sitting">👋 Sitting</option>
+                  <option value="veterinary">🏥 Veterinary</option>
+                  <option value="park">🌳 Dog Park</option>
                 </select>
               </div>
             </div>
