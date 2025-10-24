@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { ArrowLeft, Building2, Mail, Phone, MapPin, Globe, Send } from 'lucide-react';
@@ -24,6 +24,7 @@ interface Listing {
 export default function ClaimListingPage() {
   const { user, token, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [results, setResults] = useState<Listing[]>([]);
@@ -41,6 +42,24 @@ export default function ClaimListingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  // Pre-populate form from URL params
+  useEffect(() => {
+    const business = searchParams.get('business');
+    const city = searchParams.get('city');
+    const listingId = searchParams.get('id');
+
+    if (business || city) {
+      setFormData(prev => ({
+        ...prev,
+        businessName: business || prev.businessName,
+        city: city || prev.city,
+        message: listingId
+          ? `I would like to claim listing #${listingId} for ${business}`
+          : prev.message,
+      }));
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

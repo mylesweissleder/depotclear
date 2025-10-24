@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { sql } from '@vercel/postgres';
-import { MapPin, Star, Phone, Globe, ExternalLink, ArrowLeft } from 'lucide-react';
+import { MapPin, Star, Phone, Globe, ExternalLink, ArrowLeft, Award } from 'lucide-react';
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: idStr } = await params;
@@ -135,6 +135,29 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 <ExternalLink className="inline-block w-5 h-5 ml-2" />
               </a>
             ) : null}
+
+            {/* Claim This Listing */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+                <div className="flex items-start gap-4">
+                  <Award className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
+                  <div className="flex-1">
+                    <h3 className="font-black text-xl text-gray-900 mb-2">
+                      Is this your business?
+                    </h3>
+                    <p className="text-gray-700 mb-4">
+                      Claim your free listing to update information, add photos, respond to reviews, and unlock premium features.
+                    </p>
+                    <Link
+                      href={`/claim?business=${encodeURIComponent(daycare.name)}&city=${encodeURIComponent(daycare.city)}&id=${id}`}
+                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg"
+                    >
+                      Claim This Listing
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
