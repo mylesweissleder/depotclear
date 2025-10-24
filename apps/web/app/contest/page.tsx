@@ -907,7 +907,7 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
               placeholder="you@example.com"
             />
             <p className="text-xs text-gray-500 mt-2">
-              🔒 By voting, you'll receive monthly newsletters featuring contest entries, winners, and featured daycares. No spam. Unsubscribe anytime.
+              🔒 By voting, you'll receive monthly newsletters featuring contest entries, winners, and featured content and updates from Woof Spots. No spam. Unsubscribe anytime.
             </p>
           </div>
 
