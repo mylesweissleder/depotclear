@@ -130,7 +130,7 @@ export default function ContestPage() {
               <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-xl">
                 <Trophy className="w-6 h-6 text-white" />
               </div>
-              <span className="font-black text-xl">Woof Houses Contest</span>
+              <span className="font-black text-xl">Woof Spots Contest</span>
             </Link>
             <button
               onClick={() => setShowSubmitModal(true)}
@@ -169,11 +169,14 @@ export default function ContestPage() {
             <span className="text-purple-600">Contest 🐕😂</span>
           </h1>
 
-          <p className="text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-2xl text-gray-700 mb-4 max-w-3xl mx-auto leading-relaxed">
             Submit your dog's most embarrassing, hilarious, or just plain weird photo.
-            <br />
-            <span className="font-bold text-purple-600">Vote for the funniest pup & win prizes!</span>
           </p>
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-2xl px-8 py-4 inline-block mb-8 shadow-2xl transform -rotate-1">
+            <p className="text-xl font-black">
+              🗳️ Everyone votes • Top 3 dogs win cash • One grand prize across ALL categories!
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
             <button
@@ -192,7 +195,10 @@ export default function ContestPage() {
 
           {/* Prize Section */}
           <div className="bg-white/90 backdrop-blur rounded-3xl p-8 max-w-4xl mx-auto shadow-2xl border-4 border-purple-200">
-            <h3 className="text-3xl font-black mb-6">🎁 Monthly Prizes</h3>
+            <h3 className="text-3xl font-black mb-4">🎁 Monthly Prizes</h3>
+            <p className="text-lg text-purple-600 font-bold mb-6">
+              Winners selected across ALL categories combined!
+            </p>
             <div className="grid md:grid-cols-3 gap-6">
               <PrizeCard place="1st" prize="$500" color="from-yellow-400 to-orange-500" emoji="🥇" />
               <PrizeCard place="2nd" prize="$250" color="from-gray-300 to-gray-400" emoji="🥈" />
@@ -201,6 +207,9 @@ export default function ContestPage() {
             <p className="text-gray-600 mt-6 text-sm">
               Plus: Top 10 get featured on our homepage & social media! 📣
             </p>
+            <div className="mt-4 bg-purple-50 rounded-xl p-4 text-sm text-gray-700">
+              <strong>How winners are chosen:</strong> The 3 dogs with the most votes across ALL categories win. All entries compete together!
+            </div>
           </div>
         </div>
       </section>
@@ -211,6 +220,20 @@ export default function ContestPage() {
           <div className="text-center mb-12">
             <h2 className="text-5xl font-black mb-4">Choose Your Category 🏆</h2>
             <p className="text-xl text-gray-600">Pick the category that best fits your pup's brand of chaos</p>
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  const entriesSection = document.querySelector('#contest-entries');
+                  if (entriesSection) {
+                    entriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-full font-bold hover:shadow-xl transition transform hover:scale-105"
+              >
+                🌟 View All Entries
+              </button>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -231,9 +254,25 @@ export default function ContestPage() {
           <div className="text-center mb-12">
             <h2 className="text-5xl font-black mb-4">🏆 Contest Entries</h2>
             <p className="text-xl text-gray-600">Vote for your favorite ridiculous pups!</p>
-            {selectedCategory !== 'all' && (
-              <p className="text-lg text-purple-600 mt-2">
-                Showing: {categories.find(c => c.id === selectedCategory)?.name}
+            {selectedCategory !== 'all' ? (
+              <div className="mt-4">
+                <div className="inline-block bg-white rounded-full px-6 py-3 shadow-lg">
+                  <p className="text-lg font-bold text-purple-600">
+                    Showing: {categories.find(c => c.id === selectedCategory)?.name}
+                  </p>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className="text-purple-600 hover:text-purple-700 font-bold underline"
+                  >
+                    ← View All Categories
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-lg text-gray-700 mt-2 font-semibold">
+                Showing all entries across all categories
               </p>
             )}
           </div>
@@ -340,19 +379,19 @@ export default function ContestPage() {
               number="1"
               emoji="📸"
               title="Submit Photo"
-              description="Upload your dog's most ridiculous moment"
+              description="Upload your dog's most ridiculous moment in any category"
             />
             <StepCard
               number="2"
               emoji="🗳️"
               title="Get Votes"
-              description="Share with friends & family to collect votes"
+              description="People vote by entering their email - one vote per email!"
             />
             <StepCard
               number="3"
               emoji="🏆"
               title="Win Prizes"
-              description="Top 3 in each category win cash!"
+              description="Top 3 dogs overall (across all categories) win cash!"
             />
             <StepCard
               number="4"
@@ -380,16 +419,20 @@ export default function ContestPage() {
                 <span><strong>One vote per email</strong> - Email verification required to vote</span>
               </li>
               <li className="flex items-start gap-3">
+                <span className="text-2xl">🚫</span>
+                <span><strong>Gmail + trick blocked</strong> - user+1@gmail.com and user+2@gmail.com count as the same email (dots are also ignored)</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-2xl">🚫</span>
+                <span><strong>No disposable emails</strong> - Temporary/throwaway email services are blocked</span>
+              </li>
+              <li className="flex items-start gap-3">
                 <span className="text-2xl">✓</span>
                 <span><strong>IP tracking</strong> - Suspicious voting patterns will be flagged</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✓</span>
                 <span><strong>Browser fingerprinting</strong> - VPNs and bot votes detected & removed</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-2xl">✓</span>
-                <span><strong>Vote weight system</strong> - Suspicious votes count less or are removed</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✗</span>
@@ -411,6 +454,7 @@ export default function ContestPage() {
               <li>• Winners announced first Monday of following month</li>
               <li>• Prizes paid via PayPal, Venmo, or check</li>
               <li>• By submitting, you grant us rights to share your photo on social media</li>
+              <li className="text-blue-600">• <strong>Newsletter:</strong> By voting or submitting, you'll receive monthly newsletters featuring contest entries, winners, and featured daycares (unsubscribe anytime)</li>
               <li className="text-red-600">• <strong>Disqualification:</strong> AI images in non-AI categories will be removed</li>
             </ul>
           </div>
@@ -721,7 +765,7 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
 
           <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-4">
             <p className="text-sm text-gray-700">
-              <strong>By submitting:</strong> You confirm you own this photo and grant Woof Houses rights to display it on our website and social media. See full contest rules above.
+              <strong>By submitting:</strong> You confirm you own this photo and grant Woof Spots rights to display it on our website and social media. You'll also receive monthly newsletters featuring contest entries, winners, and featured daycares. Unsubscribe anytime.
             </p>
           </div>
 
@@ -754,7 +798,7 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
 
         <div className="text-center mb-6">
           <h2 className="text-4xl font-black mb-2">Vote for {entry.pup_name}! ❤️</h2>
-          <p className="text-gray-600">Enter your email to cast your vote</p>
+          <p className="text-gray-600">Cast your vote to help them win!</p>
         </div>
 
         <div className="mb-6">
@@ -764,6 +808,16 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
             className="w-full h-48 object-cover rounded-2xl"
           />
           <p className="text-gray-700 italic mt-4">"{entry.caption}"</p>
+        </div>
+
+        <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-4 mb-6">
+          <h3 className="font-black text-purple-900 mb-2">🗳️ How Voting Works:</h3>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li>• Enter your email to vote</li>
+            <li>• One vote per email address per dog</li>
+            <li>• Top 3 dogs with most votes win prizes</li>
+            <li>• Winners compete across ALL categories</li>
+          </ul>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
@@ -777,8 +831,8 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
               className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
               placeholder="you@example.com"
             />
-            <p className="text-sm text-gray-500 mt-2">
-              We'll only use this to prevent duplicate votes. One vote per dog per email.
+            <p className="text-xs text-gray-500 mt-2">
+              🔒 By voting, you'll receive monthly newsletters featuring contest entries, winners, and featured daycares. No spam. Unsubscribe anytime.
             </p>
           </div>
 

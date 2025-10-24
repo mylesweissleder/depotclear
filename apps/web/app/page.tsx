@@ -14,7 +14,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-                  Woof Houses
+                  Woof Spots
                 </h1>
                 <p className="text-xs text-orange-600 font-semibold">🐾 Daycare, Playdates, Boarding & More</p>
               </div>
@@ -280,7 +280,7 @@ export default function HomePage() {
               <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
                 <Dog className="w-6 h-6 text-white" />
               </div>
-              <span className="font-black text-lg">Woof Houses</span>
+              <span className="font-black text-lg">Woof Spots</span>
             </div>
             <p className="text-gray-400 text-sm">
               © 2025 Made with 🐾 and ❤️ for dogs everywhere

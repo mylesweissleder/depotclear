@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { Filter } from 'bad-words';
+import { normalizeEmail, isDisposableEmail } from '@/lib/email-utils';
 
 const filter = new Filter();
 
@@ -81,6 +82,12 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const contestMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
+    // Get IP address and user agent
+    const ipAddress = request.headers.get('x-forwarded-for') ||
+                      request.headers.get('x-real-ip') ||
+                      'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
     // Insert submission
     const result = await sql`
       INSERT INTO pup_submissions (
@@ -103,6 +110,21 @@ export async function POST(request: NextRequest) {
     `;
 
     const submissionId = result.rows[0].id;
+
+    // Add email to newsletter (for contest updates, winners, and featured daycares)
+    // This opts them into monthly updates about contest entries, winners, and premium accounts
+    const normalizedEmail = normalizeEmail(ownerEmail);
+    try {
+      await sql`
+        INSERT INTO newsletter_subscribers
+        (email, normalized_email, source, ip_address, user_agent, subscribed)
+        VALUES (${ownerEmail}, ${normalizedEmail}, 'contest_submission', ${ipAddress}, ${userAgent}, TRUE)
+        ON CONFLICT (email) DO NOTHING
+      `;
+    } catch (newsletterError) {
+      // Don't fail the submission if newsletter insert fails
+      console.error('Newsletter insert error (non-fatal):', newsletterError);
+    }
 
     console.log('Contest submission created:', {
       submissionId,

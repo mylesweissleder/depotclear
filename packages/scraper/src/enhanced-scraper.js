@@ -268,7 +268,38 @@ class EnhancedDogDaycareScraper {
   }
 
   async saveToDatabase(data) {
-    await this.db.query(
+    // Use place_id for conflict detection if available, otherwise fall back to name+city
+    const query = data.placeId ?
+      `INSERT INTO dog_daycares (
+        name, rating, review_count, address, phone, website, google_maps_url,
+        price_level, city, region, business_hours, business_status, google_categories,
+        latitude, longitude, place_id, service_options, wheelchair_accessible,
+        amenities, photos, scraped_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+      ON CONFLICT (place_id)
+      DO UPDATE SET
+        name = EXCLUDED.name,
+        rating = EXCLUDED.rating,
+        review_count = EXCLUDED.review_count,
+        address = EXCLUDED.address,
+        phone = EXCLUDED.phone,
+        website = EXCLUDED.website,
+        google_maps_url = EXCLUDED.google_maps_url,
+        price_level = EXCLUDED.price_level,
+        city = EXCLUDED.city,
+        region = EXCLUDED.region,
+        business_hours = EXCLUDED.business_hours,
+        business_status = EXCLUDED.business_status,
+        google_categories = EXCLUDED.google_categories,
+        latitude = EXCLUDED.latitude,
+        longitude = EXCLUDED.longitude,
+        service_options = EXCLUDED.service_options,
+        wheelchair_accessible = EXCLUDED.wheelchair_accessible,
+        amenities = EXCLUDED.amenities,
+        photos = EXCLUDED.photos,
+        scraped_at = EXCLUDED.scraped_at,
+        updated_at = CURRENT_TIMESTAMP`
+      :
       `INSERT INTO dog_daycares (
         name, rating, review_count, address, phone, website, google_maps_url,
         price_level, city, region, business_hours, business_status, google_categories,
@@ -295,31 +326,31 @@ class EnhancedDogDaycareScraper {
         amenities = EXCLUDED.amenities,
         photos = EXCLUDED.photos,
         scraped_at = EXCLUDED.scraped_at,
-        updated_at = CURRENT_TIMESTAMP`,
-      [
-        data.name,
-        data.rating,
-        data.reviewCount,
-        data.address,
-        data.phone,
-        data.website,
-        data.googleMapsUrl,
-        data.priceLevel,
-        data.city,
-        data.region,
-        JSON.stringify(data.businessHours || {}),
-        data.businessStatus || 'open',
-        JSON.stringify(data.googleCategories || []),
-        data.latitude,
-        data.longitude,
-        data.placeId,
-        JSON.stringify(data.serviceOptions || {}),
-        data.amenities?.wheelchairAccessible || false,
-        JSON.stringify(data.amenities || {}),
-        JSON.stringify(data.photos || []),
-        data.scrapedAt,
-      ]
-    );
+        updated_at = CURRENT_TIMESTAMP`;
+
+    await this.db.query(query, [
+      data.name,
+      data.rating,
+      data.reviewCount,
+      data.address,
+      data.phone,
+      data.website,
+      data.googleMapsUrl,
+      data.priceLevel,
+      data.city,
+      data.region,
+      JSON.stringify(data.businessHours || {}),
+      data.businessStatus || 'open',
+      JSON.stringify(data.googleCategories || []),
+      data.latitude,
+      data.longitude,
+      data.placeId,
+      JSON.stringify(data.serviceOptions || {}),
+      data.amenities?.wheelchairAccessible || false,
+      JSON.stringify(data.amenities || {}),
+      JSON.stringify(data.photos || []),
+      data.scrapedAt,
+    ]);
   }
 
   async close() {
@@ -335,28 +366,38 @@ async function main() {
   try {
     await scraper.initialize();
 
-    // SF Bay Area cities
+    // Complete SF Bay Area - All Major Cities by County
     const cities = [
+      // San Francisco County
       'San Francisco',
-      'Oakland',
-      'Berkeley',
-      'San Jose',
-      'Palo Alto',
-      'Mountain View',
-      'Sunnyvale',
-      'Redwood City',
-      'San Mateo',
-      'Fremont',
-      'Hayward',
-      'San Rafael',
-      'Walnut Creek',
+
+      // Marin County
+      'San Rafael', 'Novato', 'Mill Valley', 'Sausalito', 'Tiburon', 'Corte Madera', 'Larkspur', 'San Anselmo', 'Fairfax',
+
+      // Sonoma County
+      'Santa Rosa', 'Petaluma', 'Rohnert Park', 'Cotati', 'Sebastopol', 'Windsor', 'Healdsburg', 'Sonoma',
+
+      // Napa County
+      'Napa', 'American Canyon', 'St. Helena', 'Calistoga', 'Yountville',
+
+      // Contra Costa County
+      'Walnut Creek', 'Concord', 'Richmond', 'Antioch', 'Pittsburg', 'Martinez', 'Pleasant Hill', 'San Ramon', 'Danville', 'Brentwood', 'Hercules', 'Pinole', 'El Cerrito', 'Lafayette', 'Orinda',
+
+      // Alameda County
+      'Oakland', 'Berkeley', 'Fremont', 'Hayward', 'Alameda', 'San Leandro', 'Livermore', 'Pleasanton', 'Union City', 'Albany', 'Emeryville', 'Piedmont', 'Newark', 'Dublin',
+
+      // Santa Clara County (down to San Jose)
+      'San Jose', 'Sunnyvale', 'Santa Clara', 'Mountain View', 'Palo Alto', 'Milpitas', 'Cupertino', 'Campbell', 'Los Gatos', 'Saratoga', 'Morgan Hill', 'Gilroy', 'Los Altos', 'Los Altos Hills',
+
+      // San Mateo County
+      'San Mateo', 'Redwood City', 'Daly City', 'South San Francisco', 'San Bruno', 'Pacifica', 'Burlingame', 'Millbrae', 'Foster City', 'San Carlos', 'Belmont', 'Half Moon Bay', 'Menlo Park', 'Atherton', 'Portola Valley', 'Woodside',
     ];
 
     for (const city of cities) {
       await scraper.scrapeCity(city, 'CA', 'bay-area');
     }
 
-    console.log('\n🎉 All done! Enhanced scraping complete.');
+    console.log('\n🎉 All done! Enhanced scraping complete for entire Bay Area.');
 
   } catch (error) {
     console.error('❌ Fatal error:', error);

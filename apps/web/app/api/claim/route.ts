@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: 'claims@woofhouses.com',
-      to: 'hello@woofhouses.com',
+      from: 'claims@woofspots.com',
+      to: 'hello@woofspots.com',
       subject: `New Business Claim: ${businessName}`,
       html: `
         <h2>New Business Claim Request</h2>

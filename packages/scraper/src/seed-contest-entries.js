@@ -18,7 +18,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Maximus',
         owner_name: 'Sarah Johnson',
-        owner_email: 'sarah@woofhouses.com',
+        owner_email: 'sarah@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/pug/n02110958_14790.jpg',
         caption: 'My face when I hear the treat bag open 🤤',
         category: 'goofiest-face',
@@ -28,7 +28,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Bella',
         owner_name: 'Mike Chen',
-        owner_email: 'mike@woofhouses.com',
+        owner_email: 'mike@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/shihtzu/n02086240_5830.jpg',
         caption: 'Tongue stuck mid-blink... help 😛',
         category: 'biggest-derp',
@@ -38,7 +38,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Charlie',
         owner_name: 'Jessica Martinez',
-        owner_email: 'jessica@woofhouses.com',
+        owner_email: 'jessica@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/poodle-toy/n02113624_1885.jpg',
         caption: 'The groomer said "trust me"... I should have known better ✂️',
         category: 'worst-haircut',
@@ -48,7 +48,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Luna',
         owner_name: 'David Kim',
-        owner_email: 'david@woofhouses.com',
+        owner_email: 'david@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/bulldog-english/jager-1.jpg',
         caption: 'Tried to jump on the couch, became a pancake instead 🥞',
         category: 'funniest-fail',
@@ -58,7 +58,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Cooper',
         owner_name: 'Amanda Williams',
-        owner_email: 'amanda@woofhouses.com',
+        owner_email: 'amanda@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/spaniel-cocker/n02102318_4843.jpg',
         caption: 'When you say NO to second breakfast... the AUDACITY 🎭',
         category: 'most-dramatic',
@@ -68,7 +68,7 @@ async function seedContestEntries() {
       {
         pup_name: 'Daisy',
         owner_name: 'Tom Anderson',
-        owner_email: 'tom@woofhouses.com',
+        owner_email: 'tom@woofspots.com',
         photo_url: 'https://images.dog.ceo/breeds/beagle/n02088364_11843.jpg',
         caption: 'Upside down, half off the couch, living my best life 😴',
         category: 'worst-sleeper',

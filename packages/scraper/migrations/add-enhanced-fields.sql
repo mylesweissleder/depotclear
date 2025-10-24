@@ -24,7 +24,19 @@ ALTER TABLE dog_daycares
   ADD COLUMN IF NOT EXISTS service_options JSONB,
 
   -- Accessibility
-  ADD COLUMN IF NOT EXISTS wheelchair_accessible BOOLEAN;
+  ADD COLUMN IF NOT EXISTS wheelchair_accessible BOOLEAN,
+
+  -- Amenities (JSONB - {outdoor_play: true, grooming: true, webcams: true, etc.})
+  ADD COLUMN IF NOT EXISTS amenities JSONB,
+
+  -- Photos (JSONB array - ["url1", "url2", ...])
+  ADD COLUMN IF NOT EXISTS photos JSONB,
+
+  -- Business types array (daycare, boarding, grooming, training, etc.)
+  ADD COLUMN IF NOT EXISTS business_types TEXT[],
+
+  -- Timestamp when data was last scraped
+  ADD COLUMN IF NOT EXISTS scraped_at TIMESTAMP;
 
 -- Create index on place_id for faster lookups
 CREATE INDEX IF NOT EXISTS idx_dog_daycares_place_id ON dog_daycares(place_id);
@@ -34,3 +46,6 @@ CREATE INDEX IF NOT EXISTS idx_dog_daycares_coordinates ON dog_daycares(latitude
 
 -- Create index on business_status
 CREATE INDEX IF NOT EXISTS idx_dog_daycares_status ON dog_daycares(business_status);
+
+-- Create index on business_types for filtering
+CREATE INDEX IF NOT EXISTS idx_dog_daycares_business_types ON dog_daycares USING GIN(business_types);

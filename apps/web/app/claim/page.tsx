@@ -1,10 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
 import { ArrowLeft, Building2, Mail, Phone, MapPin, Globe, Send } from 'lucide-react';
 
+interface Listing {
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  website: string;
+  rating: number;
+  reviewCount: number;
+  claimed: boolean;
+  claimPending: boolean;
+}
+
 export default function ClaimListingPage() {
+  const { user, token, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cityQuery, setCityQuery] = useState('');
+  const [results, setResults] = useState<Listing[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [claiming, setClaiming] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
     ownerName: '',
