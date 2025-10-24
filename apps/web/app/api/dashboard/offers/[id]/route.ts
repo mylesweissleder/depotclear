@@ -8,7 +8,7 @@ import { sql } from '@vercel/postgres';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -20,7 +20,7 @@ export async function PATCH(
       );
     }
 
-    const offerId = parseInt(params.id);
+    const resolvedParams = await params; const offerId = parseInt(resolvedParams.id);
     if (isNaN(offerId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid offer ID' },
@@ -139,7 +139,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -151,7 +151,7 @@ export async function DELETE(
       );
     }
 
-    const offerId = parseInt(params.id);
+    const resolvedParams = await params; const offerId = parseInt(resolvedParams.id);
     if (isNaN(offerId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid offer ID' },

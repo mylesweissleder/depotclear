@@ -69,8 +69,8 @@ async function getDaycareWithOffers(id: string) {
   }
 }
 
-export default async function DaycarePage({ params }: { params: { id: string } }) {
-  const data = await getDaycareWithOffers(params.id);
+export default async function DaycarePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params; const data = await getDaycareWithOffers(resolvedParams.id);
 
   if (!data) {
     notFound();

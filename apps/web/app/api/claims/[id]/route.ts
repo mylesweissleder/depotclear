@@ -8,7 +8,7 @@ import { sql } from '@vercel/postgres';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -20,7 +20,7 @@ export async function GET(
       );
     }
 
-    const claimId = parseInt(params.id);
+    const resolvedParams = await params; const claimId = parseInt(resolvedParams.id);
     if (isNaN(claimId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid claim ID' },
@@ -109,7 +109,7 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -121,7 +121,7 @@ export async function DELETE(
       );
     }
 
-    const claimId = parseInt(params.id);
+    const resolvedParams = await params; const claimId = parseInt(resolvedParams.id);
     if (isNaN(claimId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid claim ID' },

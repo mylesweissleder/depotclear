@@ -8,7 +8,7 @@ import { sql } from '@vercel/postgres';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -20,7 +20,7 @@ export async function PATCH(
       );
     }
 
-    const businessId = parseInt(params.id);
+    const resolvedParams = await params; const businessId = parseInt(resolvedParams.id);
     if (isNaN(businessId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid business ID' },
@@ -157,7 +157,7 @@ export async function PATCH(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await authenticate(request);
@@ -169,7 +169,7 @@ export async function GET(
       );
     }
 
-    const businessId = parseInt(params.id);
+    const resolvedParams = await params; const businessId = parseInt(resolvedParams.id);
     if (isNaN(businessId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid business ID' },

@@ -5,7 +5,7 @@ import { sendClaimApprovalEmail, sendClaimRejectionEmail } from '@/lib/email';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = await authenticateAdmin(request);
@@ -26,7 +26,7 @@ export async function PATCH(
       );
     }
 
-    const claimId = parseInt(params.id);
+    const resolvedParams = await params; const claimId = parseInt(resolvedParams.id);
     if (isNaN(claimId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid claim ID' },
