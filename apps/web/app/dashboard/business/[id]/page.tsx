@@ -126,17 +126,17 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
       fetchBusiness();
       fetchOffers();
     }
-  }, [user, token, params.id]);
+  }, [user, token, id]);
 
   useEffect(() => {
     if (activeTab === 'analytics' && user && token) {
       fetchAnalytics();
     }
-  }, [activeTab, analyticsPeriod, user, token, params.id]);
+  }, [activeTab, analyticsPeriod, user, token, id]);
 
   const fetchBusiness = async () => {
     try {
-      const response = await fetch(`/api/dashboard/businesses/${params.id}`, {
+      const response = await fetch(`/api/dashboard/businesses/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -164,7 +164,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch(`/api/dashboard/offers?businessId=${params.id}`, {
+      const response = await fetch(`/api/dashboard/offers?businessId=${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -183,7 +183,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
     setAnalyticsLoading(true);
     try {
       const response = await fetch(
-        `/api/dashboard/analytics/${params.id}?period=${analyticsPeriod}`,
+        `/api/dashboard/analytics/${id}?period=${analyticsPeriod}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
     setError('');
 
     try {
-      const response = await fetch(`/api/dashboard/businesses/${params.id}`, {
+      const response = await fetch(`/api/dashboard/businesses/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          businessId: parseInt(params.id),
+          businessId: parseInt(id),
           ...offerFormData,
           discountAmount: parseFloat(offerFormData.discountAmount),
         }),
@@ -337,7 +337,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          businessId: parseInt(params.id),
+          businessId: parseInt(id),
           photoUrl: photoUrl.trim(),
         }),
       });
@@ -369,7 +369,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
 
     try {
       const response = await fetch(
-        `/api/dashboard/photos?businessId=${params.id}&photoUrl=${encodeURIComponent(photoUrl)}`,
+        `/api/dashboard/photos?businessId=${id}&photoUrl=${encodeURIComponent(photoUrl)}`,
         {
           method: 'DELETE',
           headers: {
@@ -416,7 +416,7 @@ export default function BusinessManagementPage({ params }: { params: Promise<{ i
   const handleSaveHours = async () => {
     setSavingHours(true);
     try {
-      const response = await fetch(`/api/dashboard/businesses/${params.id}`, {
+      const response = await fetch(`/api/dashboard/businesses/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
