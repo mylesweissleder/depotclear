@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -21,7 +21,7 @@ interface Listing {
   claimPending: boolean;
 }
 
-export default function ClaimListingPage() {
+function ClaimListingContent() {
   const { user, token, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -296,5 +296,17 @@ export default function ClaimListingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ClaimListingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    }>
+      <ClaimListingContent />
+    </Suspense>
   );
 }
