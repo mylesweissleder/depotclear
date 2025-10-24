@@ -1,7 +1,12 @@
+'use client';
+
 import { Search, MapPin, Award, Heart, Filter, Star, Shield, Sparkles, PartyPopper, Dog } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50">
       {/* Header */}
@@ -26,7 +31,7 @@ export default function HomePage() {
               <a href="#for-businesses" className="text-gray-700 hover:text-orange-500 font-semibold">List Your Business</a>
             </nav>
             <Link href="/search" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full hover:shadow-xl transition transform hover:scale-105 font-bold">
-              🐕 Find Daycare
+              🐕 Find Care
             </Link>
           </div>
         </div>
@@ -44,35 +49,75 @@ export default function HomePage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
+            {/* Logo */}
+            <div className="flex justify-center mb-6">
+              <Image
+                src="/woofspotslogo.png"
+                alt="Woof Spots"
+                width={120}
+                height={120}
+                className="drop-shadow-2xl"
+              />
+            </div>
+
             <div className="inline-block mb-4">
               <span className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold animate-pulse">
                 🎉 100% Free for Pet Parents!
               </span>
             </div>
             <h2 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                Woof! Find the
-              </span>
-              <br />
-              <span className="text-gray-900">Perfect Dog Care</span>
-              <br />
-              <span className="text-orange-500">for Your Pup 🐾</span>
+              <span className="text-gray-900">Find Trusted Dog Care Near You</span>
             </h2>
-            <p className="text-xl md:text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
-              The nation's most <span className="text-orange-600 font-bold">tail-wagging</span> directory of dog care services!
-              <br />
-              Compare ratings, check Google reviews, and find the perfect spot for your furry friend.
+            <p className="text-xl md:text-2xl text-gray-700 mb-4 font-medium leading-relaxed">
+              Daycare • Boarding • Grooming • Walking • Sitting • Training
             </p>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 font-medium">
+              Compare ratings, read real reviews, and find the perfect care for your furry friend.
+            </p>
+
+            {/* Location Search Widget */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const city = formData.get('city') as string;
+                  if (city?.trim()) {
+                    router.push(`/search?city=${encodeURIComponent(city.trim())}`);
+                  }
+                }}
+                className="bg-white rounded-2xl shadow-2xl p-6 border-4 border-orange-200"
+              >
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 relative">
+                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      name="city"
+                      placeholder="Enter city or ZIP code..."
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-300 rounded-xl text-lg focus:border-orange-500 focus:outline-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-orange-300 transition transform hover:scale-105 whitespace-nowrap"
+                  >
+                    🔍 Search
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mt-3 text-center">
+                  Or <Link href="/search" className="text-orange-500 hover:underline font-semibold">browse all locations</Link>
+                </p>
+              </form>
+            </div>
+
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/search" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-black text-lg shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110">
-                🔍 Browse All Daycares →
-              </Link>
               <a href="#for-businesses" className="bg-white border-4 border-orange-500 text-orange-600 px-10 py-5 rounded-full font-black text-lg shadow-xl hover:bg-orange-50 transition transform hover:scale-110">
                 💼 List Your Business (Free!)
               </a>
             </div>
             <p className="text-sm text-gray-600 mt-6 font-semibold">
-              ✨ No signup required • 5,000+ verified daycares • Updated daily
+              ✨ No signup required • 5,000+ care providers • 50+ cities • Updated daily
             </p>
           </div>
         </div>
@@ -105,8 +150,8 @@ export default function HomePage() {
       <section className="py-16 bg-white/60 backdrop-blur border-y-4 border-orange-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
-            <StatCard emoji="🏆" number="5,000+" label="Verified Daycares" color="orange" />
-            <StatCard emoji="📍" number="4" label="Major Metro Areas" color="pink" />
+            <StatCard emoji="🏆" number="5,000+" label="Care Providers" color="orange" />
+            <StatCard emoji="📍" number="50" label="Major Metro Areas" color="pink" />
             <StatCard emoji="⭐" number="4.6★" label="Average Rating" color="yellow" />
             <StatCard emoji="🎁" number="Free" label="For Pet Owners" color="green" />
           </div>
@@ -159,7 +204,7 @@ export default function HomePage() {
           <div className="text-center">
             <Link href="/search" className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-black text-xl shadow-2xl hover:shadow-orange-300 transition transform hover:scale-110">
               <Dog className="w-6 h-6" />
-              See All Daycares
+              Browse All Providers
               <span className="text-2xl">→</span>
             </Link>
           </div>
@@ -177,7 +222,7 @@ export default function HomePage() {
             <FunFeatureCard
               emoji="🔍"
               title="Super Easy Search"
-              description="Browse daycares across major US metros. Filter by city, rating, and more!"
+              description="Browse dog care services across 50+ major US metros. Filter by city, rating, and more!"
               color="orange"
             />
             <FunFeatureCard
@@ -235,9 +280,9 @@ export default function HomePage() {
           <div className="inline-block bg-yellow-400 text-gray-900 px-6 py-2 rounded-full text-sm font-bold mb-6">
             🎁 LIMITED TIME OFFER
           </div>
-          <h3 className="text-5xl md:text-6xl font-black mb-6">Own a Dog Daycare?</h3>
+          <h3 className="text-5xl md:text-6xl font-black mb-6">Own a Dog Care Business?</h3>
           <p className="text-2xl mb-8 leading-relaxed">
-            List your business <span className="bg-yellow-400 text-gray-900 px-3 py-1 rounded-lg font-black">FREE</span> during our beta!
+            List your daycare, boarding, grooming, or training business <span className="bg-yellow-400 text-gray-900 px-3 py-1 rounded-lg font-black">FREE</span> during our beta!
             <br />
             Get discovered by thousands of pet parents nationwide.
           </p>
@@ -260,8 +305,30 @@ export default function HomePage() {
           >
             🎯 Claim Your Free Listing →
           </Link>
+
+          <div className="mt-10 bg-white/10 backdrop-blur border-2 border-white/30 rounded-2xl p-8">
+            <h5 className="text-2xl font-black mb-4">💎 Premium Plans Coming Soon</h5>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="font-bold mb-2">🆓 Free Forever</p>
+                <p className="text-white/90">Basic listing • Contact info • Reviews</p>
+              </div>
+              <div>
+                <p className="font-bold mb-2">⭐ Pro ($49/mo)</p>
+                <p className="text-white/90">Priority placement • Photo gallery • Booking integration</p>
+              </div>
+              <div>
+                <p className="font-bold mb-2">💎 Premium ($99/mo)</p>
+                <p className="text-white/90">Featured homepage spot • Analytics dashboard • Premium badge</p>
+              </div>
+            </div>
+            <p className="text-sm text-white/70 mt-4 text-center">
+              🎁 All beta users locked into free tier forever, with first access to premium features at discounted rates
+            </p>
+          </div>
+
           <p className="text-sm text-white/80 mt-6 font-semibold">
-            ⏰ Limited to first 100 businesses • Premium features coming soon
+            ⏰ Limited to first 100 businesses
           </p>
         </div>
       </section>
