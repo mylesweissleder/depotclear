@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Send, Eye, Mail, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Send, Eye, Mail, Users, LogOut } from 'lucide-react';
 
 interface ContestEntry {
   id: number;
@@ -23,6 +24,7 @@ interface Daycare {
 }
 
 export default function NewsletterAdmin() {
+  const router = useRouter();
   const [month, setMonth] = useState(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }));
   const [customMessage, setCustomMessage] = useState('');
   const [selectedWinners, setSelectedWinners] = useState<number[]>([]);
@@ -37,11 +39,43 @@ export default function NewsletterAdmin() {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  // Check authentication
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   // Load contest entries and daycares
   useEffect(() => {
-    loadData();
-  }, []);
+    if (authenticated) {
+      loadData();
+    }
+  }, [authenticated]);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch('/api/admin/auth');
+      const data = await res.json();
+      if (data.authenticated) {
+        setAuthenticated(true);
+      } else {
+        router.push('/admin/login?returnTo=/admin/newsletter');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      router.push('/admin/login?returnTo=/admin/newsletter');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+      router.push('/admin/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -219,14 +253,23 @@ export default function NewsletterAdmin() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-gray-900 mb-2">Newsletter Admin</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Users className="w-5 h-5" />
-              <span className="font-semibold">{subscriberCount.toLocaleString()} subscribers</span>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-black text-gray-900 mb-2">Newsletter Admin</h1>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-gray-600">
+                <Users className="w-5 h-5" />
+                <span className="font-semibold">{subscriberCount.toLocaleString()} subscribers</span>
+              </div>
             </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold text-gray-700 transition"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
 
         {message && (
