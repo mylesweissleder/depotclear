@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
               ${session.customer as string},
               ${subscription.id},
               ${subscription.items.data[0].price.id},
-              to_timestamp(${subscription.currentPeriodStart}),
-              to_timestamp(${subscription.currentPeriodEnd}),
+              to_timestamp(${subscription.current_period_start}),
+              to_timestamp(${subscription.current_period_end}),
               CURRENT_TIMESTAMP,
               CURRENT_TIMESTAMP
             )
