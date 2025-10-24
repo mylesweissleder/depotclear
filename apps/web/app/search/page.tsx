@@ -321,11 +321,29 @@ function DaycareCard({ daycare }: { daycare: any }) {
         {daycare.rating && (
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center gap-1">
-              <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-              <span className="font-bold text-lg">{parseFloat(daycare.rating).toFixed(1)}</span>
+              {[1, 2, 3, 4, 5].map((star) => {
+                const rating = parseFloat(daycare.rating);
+                const filled = star <= rating;
+                const partial = star > rating && star - 1 < rating;
+                return (
+                  <Star
+                    key={star}
+                    className={`w-4 h-4 ${
+                      filled
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : partial
+                        ? 'fill-yellow-200 text-yellow-400'
+                        : 'fill-gray-200 text-gray-300'
+                    }`}
+                  />
+                );
+              })}
+              <span className="font-bold text-lg ml-1">{parseFloat(daycare.rating).toFixed(1)}</span>
             </div>
-            {daycare.review_count && (
+            {daycare.review_count ? (
               <span className="text-gray-500 text-sm">({daycare.review_count} reviews)</span>
+            ) : (
+              <span className="text-gray-400 text-sm italic">No reviews yet</span>
             )}
           </div>
         )}
