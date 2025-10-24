@@ -3,7 +3,7 @@ import { sql } from '@vercel/postgres';
 import { Resend } from 'resend';
 import MonthlyNewsletter from '@/emails/MonthlyNewsletter';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "dummy_key_for_build");
 
 export async function POST(request: NextRequest) {
   try {

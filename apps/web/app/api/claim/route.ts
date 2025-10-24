@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     Example Resend integration (once set up):
 
     import { Resend } from 'resend';
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(process.env.RESEND_API_KEY || "dummy_key_for_build");
 
     await resend.emails.send({
       from: 'claims@woofspots.com',
