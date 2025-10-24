@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription: any = event.data.object;
 
         // Update subscription status
         await sql`
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription: any = event.data.object;
 
         // Mark subscription as cancelled
         await sql`
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice: any = event.data.object;
 
         if (invoice.subscription) {
           // Update subscription with latest payment info
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice: any = event.data.object;
 
         if (invoice.subscription) {
           // Mark subscription as past_due
