@@ -372,6 +372,10 @@ function DaycareCard({ daycare }: { daycare: any }) {
           )}
         </div>
 
+        <div className="text-xs text-gray-400 italic mb-2 text-center">
+          Rating from Google Maps
+        </div>
+
         {daycare.google_maps_url && (
           <a
             href={daycare.google_maps_url}
@@ -379,7 +383,7 @@ function DaycareCard({ daycare }: { daycare: any }) {
             rel="noopener noreferrer"
             className="block w-full bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
           >
-            View on Google Maps
+            View Full Details on Google Maps
             <ExternalLink className="inline-block w-3 h-3 ml-1" />
           </a>
         )}

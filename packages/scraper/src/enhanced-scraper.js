@@ -268,92 +268,58 @@ class EnhancedDogDaycareScraper {
   }
 
   async saveToDatabase(data) {
-    try {
-      await this.db.query(
-        `INSERT INTO dog_daycares (
-          name, rating, review_count, address, phone, website, google_maps_url,
-          price_level, city, region, business_hours, business_status, google_categories,
-          latitude, longitude, place_id, service_options, wheelchair_accessible,
-          amenities, photos, scraped_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
-        ON CONFLICT (place_id)
-        DO UPDATE SET
-          rating = EXCLUDED.rating,
-          review_count = EXCLUDED.review_count,
-          address = EXCLUDED.address,
-          phone = EXCLUDED.phone,
-          website = EXCLUDED.website,
-          business_hours = EXCLUDED.business_hours,
-          business_status = EXCLUDED.business_status,
-          google_categories = EXCLUDED.google_categories,
-          latitude = EXCLUDED.latitude,
-          longitude = EXCLUDED.longitude,
-          service_options = EXCLUDED.service_options,
-          wheelchair_accessible = EXCLUDED.wheelchair_accessible,
-          amenities = EXCLUDED.amenities,
-          photos = EXCLUDED.photos,
-          updated_at = CURRENT_TIMESTAMP`,
-        [
-          data.name,
-          data.rating,
-          data.reviewCount,
-          data.address,
-          data.phone,
-          data.website,
-          data.googleMapsUrl,
-          data.priceLevel,
-          data.city,
-          data.region,
-          JSON.stringify(data.businessHours || {}),
-          data.businessStatus || 'open',
-          JSON.stringify(data.googleCategories || []),
-          data.latitude,
-          data.longitude,
-          data.placeId,
-          JSON.stringify(data.serviceOptions || {}),
-          data.amenities?.wheelchairAccessible || false,
-          JSON.stringify(data.amenities || {}),
-          JSON.stringify(data.photos || []),
-          data.scrapedAt,
-        ]
-      );
-    } catch (error) {
-      // If place_id is null, try inserting without conflict handling
-      if (error.message.includes('null value') && error.message.includes('place_id')) {
-        await this.db.query(
-          `INSERT INTO dog_daycares (
-            name, rating, review_count, address, phone, website, google_maps_url,
-            price_level, city, region, business_hours, business_status, google_categories,
-            latitude, longitude, service_options, wheelchair_accessible,
-            amenities, photos, scraped_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
-          [
-            data.name,
-            data.rating,
-            data.reviewCount,
-            data.address,
-            data.phone,
-            data.website,
-            data.googleMapsUrl,
-            data.priceLevel,
-            data.city,
-            data.region,
-            JSON.stringify(data.businessHours || {}),
-            data.businessStatus || 'open',
-            JSON.stringify(data.googleCategories || []),
-            data.latitude,
-            data.longitude,
-            JSON.stringify(data.serviceOptions || {}),
-            data.amenities?.wheelchairAccessible || false,
-            JSON.stringify(data.amenities || {}),
-            JSON.stringify(data.photos || []),
-            data.scrapedAt,
-          ]
-        );
-      } else {
-        throw error;
-      }
-    }
+    await this.db.query(
+      `INSERT INTO dog_daycares (
+        name, rating, review_count, address, phone, website, google_maps_url,
+        price_level, city, region, business_hours, business_status, google_categories,
+        latitude, longitude, place_id, service_options, wheelchair_accessible,
+        amenities, photos, scraped_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+      ON CONFLICT (name, city)
+      DO UPDATE SET
+        rating = EXCLUDED.rating,
+        review_count = EXCLUDED.review_count,
+        address = EXCLUDED.address,
+        phone = EXCLUDED.phone,
+        website = EXCLUDED.website,
+        google_maps_url = EXCLUDED.google_maps_url,
+        price_level = EXCLUDED.price_level,
+        business_hours = EXCLUDED.business_hours,
+        business_status = EXCLUDED.business_status,
+        google_categories = EXCLUDED.google_categories,
+        latitude = EXCLUDED.latitude,
+        longitude = EXCLUDED.longitude,
+        place_id = EXCLUDED.place_id,
+        service_options = EXCLUDED.service_options,
+        wheelchair_accessible = EXCLUDED.wheelchair_accessible,
+        amenities = EXCLUDED.amenities,
+        photos = EXCLUDED.photos,
+        scraped_at = EXCLUDED.scraped_at,
+        updated_at = CURRENT_TIMESTAMP`,
+      [
+        data.name,
+        data.rating,
+        data.reviewCount,
+        data.address,
+        data.phone,
+        data.website,
+        data.googleMapsUrl,
+        data.priceLevel,
+        data.city,
+        data.region,
+        JSON.stringify(data.businessHours || {}),
+        data.businessStatus || 'open',
+        JSON.stringify(data.googleCategories || []),
+        data.latitude,
+        data.longitude,
+        data.placeId,
+        JSON.stringify(data.serviceOptions || {}),
+        data.amenities?.wheelchairAccessible || false,
+        JSON.stringify(data.amenities || {}),
+        JSON.stringify(data.photos || []),
+        data.scrapedAt,
+      ]
+    );
   }
 
   async close() {
