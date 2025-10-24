@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
 
         // Get subscription details
         if (session.subscription && session.metadata) {
-          const subscription = await stripe.subscriptions.retrieve(
+          const subscription: any = await stripe.subscriptions.retrieve(
             session.subscription as string
-          ) as Stripe.Subscription;
+          );
 
           // Create subscription record
           await sql`
