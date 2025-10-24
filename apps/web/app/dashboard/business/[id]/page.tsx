@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -41,7 +41,8 @@ interface Offer {
   active: boolean;
 }
 
-export default function BusinessManagementPage({ params }: { params: { id: string } }) {
+export default function BusinessManagementPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const { user, token, loading: authLoading } = useAuth();
   const router = useRouter();
   const [business, setBusiness] = useState<Business | null>(null);
