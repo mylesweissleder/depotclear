@@ -118,6 +118,14 @@ export default function PricingPage() {
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Limited Time Banner */}
+        <div className="mb-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 text-center text-white shadow-xl border-4 border-green-400">
+          <div className="flex items-center justify-center gap-2 text-xl md:text-2xl font-black">
+            <span className="text-3xl">⏰</span>
+            Limited Time: Free listings available for first 100 businesses. Premium features coming soon!
+          </div>
+        </div>
+
         <div className="text-center mb-12">
           <div className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold mb-6">
             <Sparkles className="inline-block w-4 h-4 mr-2" />
