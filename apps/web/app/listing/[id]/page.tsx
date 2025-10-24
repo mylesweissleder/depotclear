@@ -96,8 +96,31 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               Rating and business information from Google Maps
             </div>
 
-            {/* Google Maps Link */}
-            {daycare.google_maps_url && (
+            {/* Primary CTA - Business Website */}
+            {daycare.website ? (
+              <div className="space-y-3">
+                <a
+                  href={daycare.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
+                >
+                  Visit Official Website
+                  <ExternalLink className="inline-block w-5 h-5 ml-2" />
+                </a>
+                {daycare.google_maps_url && (
+                  <a
+                    href={daycare.google_maps_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-white border-2 border-orange-500 text-orange-500 text-center py-3 rounded-2xl font-bold text-base hover:bg-orange-50 transition"
+                  >
+                    View Reviews & Directions on Google Maps
+                    <ExternalLink className="inline-block w-4 h-4 ml-2" />
+                  </a>
+                )}
+              </div>
+            ) : daycare.google_maps_url ? (
               <a
                 href={daycare.google_maps_url}
                 target="_blank"
@@ -107,7 +130,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 View Full Details & Reviews on Google Maps
                 <ExternalLink className="inline-block w-5 h-5 ml-2" />
               </a>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

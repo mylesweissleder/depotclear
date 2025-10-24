@@ -303,8 +303,9 @@ export default function SearchPage() {
 
 function DaycareCard({ daycare }: { daycare: any }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 border-transparent hover:border-blue-600">
-      <div className="p-6">
+    <Link href={`/listing/${daycare.id}`} className="block">
+      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 border-transparent hover:border-blue-600">
+        <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 className="font-bold text-lg mb-1 text-gray-900">{daycare.name}</h3>
@@ -372,22 +373,11 @@ function DaycareCard({ daycare }: { daycare: any }) {
           )}
         </div>
 
-        <div className="text-xs text-gray-400 italic mb-2 text-center">
-          Rating from Google Maps
+        <div className="text-xs text-gray-400 italic text-center">
+          Click to view full details
         </div>
-
-        {daycare.google_maps_url && (
-          <a
-            href={daycare.google_maps_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
-          >
-            View Full Details on Google Maps
-            <ExternalLink className="inline-block w-3 h-3 ml-1" />
-          </a>
-        )}
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
