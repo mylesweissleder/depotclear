@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
           AND rating >= ${minRating}
         ORDER BY
           CASE tier
-            WHEN 'premium' THEN 1
+            WHEN 'top_dog' THEN 1
             WHEN 'claimed' THEN 2
             ELSE 3
           END,
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           AND city = ${city}
         ORDER BY
           CASE tier
-            WHEN 'premium' THEN 1
+            WHEN 'top_dog' THEN 1
             WHEN 'claimed' THEN 2
             ELSE 3
           END,
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
           AND rating >= ${minRating}
         ORDER BY
           CASE tier
-            WHEN 'premium' THEN 1
+            WHEN 'top_dog' THEN 1
             WHEN 'claimed' THEN 2
             ELSE 3
           END,
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
         WHERE region = ${region}
         ORDER BY
           CASE tier
-            WHEN 'premium' THEN 1
+            WHEN 'top_dog' THEN 1
             WHEN 'claimed' THEN 2
             ELSE 3
           END,

@@ -96,9 +96,9 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-start justify-between gap-4 mb-2">
             <h1 className="text-3xl font-bold text-gray-900">{daycare.name}</h1>
-            {tier === 'premium' && (
+            {tier === 'top_dog' && (
               <span className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-full font-black text-sm shadow-lg">
-                ⭐ PREMIUM
+                ⭐ TOP DOG
               </span>
             )}
           </div>
@@ -174,7 +174,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Active Offers - Premium only */}
-            {tier === 'premium' && offers.length > 0 && (
+            {tier === 'top_dog' && offers.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">🎁 Special Offers</h2>
                 <div className="space-y-4">
@@ -219,7 +219,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
             )}
 
             {/* Description - Premium only */}
-            {tier === 'premium' && daycare.description && (
+            {tier === 'top_dog' && daycare.description && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">About Us</h2>
                 <p className="text-gray-700 whitespace-pre-line">{daycare.description}</p>
@@ -227,7 +227,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
             )}
 
             {/* Amenities - Premium only */}
-            {tier === 'premium' && daycare.amenities && Object.keys(daycare.amenities).length > 0 && (
+            {tier === 'top_dog' && daycare.amenities && Object.keys(daycare.amenities).length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -244,7 +244,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
             )}
 
             {/* Photos - Premium only */}
-            {tier === 'premium' && daycare.photos && daycare.photos.length > 0 && (
+            {tier === 'top_dog' && daycare.photos && daycare.photos.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Photos</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -310,7 +310,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
             )}
 
             {/* Business Hours - Premium only */}
-            {tier === 'premium' && daycare.businessHours && (
+            {tier === 'top_dog' && daycare.businessHours && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Business Hours</h3>
                 <div className="space-y-2">
@@ -340,13 +340,13 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
 
             {tier === 'claimed' && (
               <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg p-6 text-white">
-                <h3 className="text-xl font-bold mb-2">Get 5x More Leads</h3>
-                <p className="mb-4">Upgrade to Premium for priority placement, photos, offers, and analytics!</p>
+                <h3 className="text-xl font-bold mb-2">Become a Top Dog 🐕</h3>
+                <p className="mb-4">Upgrade to Top Dog for priority placement, photos, offers, and analytics!</p>
                 <Link
                   href={`/pricing?id=${daycare.id}`}
                   className="block w-full text-center px-4 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100"
                 >
-                  Upgrade to Premium - $99/mo
+                  Become a Top Dog - $99/mo
                 </Link>
               </div>
             )}

@@ -48,10 +48,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           <div className="bg-gradient-to-r from-orange-400 to-pink-500 p-8 text-white">
             <div className="flex items-start justify-between gap-4 mb-4">
               <h1 className="text-4xl md:text-5xl font-black">{daycare.name}</h1>
-              {tier === 'premium' && (
+              {tier === 'top_dog' && (
                 <div className="flex items-center gap-2 bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-black text-sm shadow-lg">
                   <Award className="w-5 h-5" />
-                  PREMIUM
+                  TOP DOG
                 </div>
               )}
             </div>
@@ -184,10 +184,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                     <Award className="w-8 h-8 text-purple-600 flex-shrink-0 mt-1" />
                     <div className="flex-1">
                       <h3 className="font-black text-xl text-gray-900 mb-2">
-                        Get 5x More Leads with Premium
+                        Become a Top Dog 🐕
                       </h3>
                       <p className="text-gray-700 mb-3">
-                        Upgrade to Premium to appear first in search results, add photos, special offers, and get detailed analytics.
+                        Upgrade to Top Dog to appear first in search results, add photos, special offers, and get detailed analytics.
                       </p>
                       <ul className="text-gray-700 text-sm mb-4 space-y-1">
                         <li>✅ Priority placement in search</li>
@@ -199,7 +199,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                         href={`/pricing?id=${id}`}
                         className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-105"
                       >
-                        Upgrade to Premium - $99/mo
+                        Become a Top Dog - $99/mo
                       </Link>
                     </div>
                   </div>

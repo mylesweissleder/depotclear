@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
                 <li>✅ "Verified Claim" badge</li>
               </ul>
 
-              <h3>Want Even More Visibility?</h3>
-              <p>Upgrade to Premium to get:</p>
+              <h3>Want to Become a Top Dog?</h3>
+              <p>Upgrade to Top Dog to get:</p>
               <ul>
                 <li>⭐ Priority placement in search results</li>
                 <li>📸 Photo gallery (up to 20 photos)</li>
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
                 <li>📞 Contact form integration</li>
               </ul>
               <p><strong>Just $99/month or $990/year (2 months free!)</strong></p>
-              <p><a href="https://woofspots.com/pricing?id=${listingId}" style="background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin-top: 16px;">Upgrade to Premium</a></p>
+              <p><a href="https://woofspots.com/pricing?id=${listingId}" style="background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin-top: 16px;">Become a Top Dog</a></p>
 
               <hr style="margin: 32px 0; border: none; border-top: 1px solid #E5E7EB;" />
               <p style="color: #6B7280; font-size: 14px;">

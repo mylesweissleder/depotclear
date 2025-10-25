@@ -1,8 +1,8 @@
 -- Add tier system for dog daycare listings
--- Supports: unclaimed (default), claimed (free), premium (paid)
+-- Supports: unclaimed (default), claimed (free), top_dog (paid)
 
 -- Add tier column with enum type
-CREATE TYPE listing_tier AS ENUM ('unclaimed', 'claimed', 'premium');
+CREATE TYPE listing_tier AS ENUM ('unclaimed', 'claimed', 'top_dog');
 
 ALTER TABLE dog_daycares
 ADD COLUMN IF NOT EXISTS tier listing_tier DEFAULT 'unclaimed';
@@ -10,8 +10,8 @@ ADD COLUMN IF NOT EXISTS tier listing_tier DEFAULT 'unclaimed';
 -- Add tier-related timestamps
 ALTER TABLE dog_daycares
 ADD COLUMN IF NOT EXISTS claimed_at TIMESTAMP,
-ADD COLUMN IF NOT EXISTS premium_since TIMESTAMP,
-ADD COLUMN IF NOT EXISTS premium_until TIMESTAMP;
+ADD COLUMN IF NOT EXISTS top_dog_since TIMESTAMP,
+ADD COLUMN IF NOT EXISTS top_dog_until TIMESTAMP;
 
 -- Add Stripe integration fields
 ALTER TABLE dog_daycares
@@ -31,36 +31,36 @@ ADD COLUMN IF NOT EXISTS verification_method TEXT; -- email, phone, document
 
 -- Create indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_daycares_tier ON dog_daycares(tier);
-CREATE INDEX IF NOT EXISTS idx_daycares_premium_until ON dog_daycares(premium_until) WHERE tier = 'premium';
+CREATE INDEX IF NOT EXISTS idx_daycares_top_dog_until ON dog_daycares(top_dog_until) WHERE tier = 'top_dog';
 CREATE INDEX IF NOT EXISTS idx_daycares_stripe_customer ON dog_daycares(stripe_customer_id) WHERE stripe_customer_id IS NOT NULL;
 
--- Create index for searching premium listings first
+-- Create index for searching Top Dog listings first
 CREATE INDEX IF NOT EXISTS idx_daycares_tier_rating
 ON dog_daycares(tier DESC, rating DESC NULLS LAST, review_count DESC NULLS LAST);
 
 -- Comments for documentation
-COMMENT ON COLUMN dog_daycares.tier IS 'Listing tier: unclaimed (default, limited info), claimed (free with contact), premium (paid, all features)';
+COMMENT ON COLUMN dog_daycares.tier IS 'Listing tier: unclaimed (default, limited info), claimed (free with contact), top_dog (paid, all features)';
 COMMENT ON COLUMN dog_daycares.claimed_at IS 'When the business owner claimed this listing';
-COMMENT ON COLUMN dog_daycares.premium_since IS 'When premium subscription started';
-COMMENT ON COLUMN dog_daycares.premium_until IS 'When premium subscription expires (NULL = active monthly)';
+COMMENT ON COLUMN dog_daycares.top_dog_since IS 'When Top Dog subscription started';
+COMMENT ON COLUMN dog_daycares.top_dog_until IS 'When Top Dog subscription expires (NULL = active monthly)';
 COMMENT ON COLUMN dog_daycares.stripe_customer_id IS 'Stripe customer ID for billing';
 COMMENT ON COLUMN dog_daycares.stripe_subscription_id IS 'Stripe subscription ID';
 COMMENT ON COLUMN dog_daycares.verified IS 'Whether business ownership has been verified';
 
--- Function to check if premium is active
-CREATE OR REPLACE FUNCTION is_premium_active(daycare_id INTEGER)
+-- Function to check if Top Dog is active
+CREATE OR REPLACE FUNCTION is_top_dog_active(daycare_id INTEGER)
 RETURNS BOOLEAN AS $$
 DECLARE
   tier_val listing_tier;
   expiry_date TIMESTAMP;
 BEGIN
-  SELECT tier, premium_until INTO tier_val, expiry_date
+  SELECT tier, top_dog_until INTO tier_val, expiry_date
   FROM dog_daycares
   WHERE id = daycare_id;
 
-  IF tier_val = 'premium' THEN
-    -- If premium_until is NULL, it's an active monthly subscription
-    -- If premium_until is set, check if it's in the future
+  IF tier_val = 'top_dog' THEN
+    -- If top_dog_until is NULL, it's an active monthly subscription
+    -- If top_dog_until is set, check if it's in the future
     RETURN (expiry_date IS NULL OR expiry_date > NOW());
   END IF;
 
@@ -89,8 +89,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to upgrade listing to premium
-CREATE OR REPLACE FUNCTION upgrade_to_premium(
+-- Function to upgrade listing to Top Dog
+CREATE OR REPLACE FUNCTION upgrade_to_top_dog(
   daycare_id INTEGER,
   customer_id TEXT,
   subscription_id TEXT,
@@ -109,9 +109,9 @@ BEGIN
 
   UPDATE dog_daycares
   SET
-    tier = 'premium',
-    premium_since = NOW(),
-    premium_until = expiry_date,
+    tier = 'top_dog',
+    top_dog_since = NOW(),
+    top_dog_until = expiry_date,
     stripe_customer_id = customer_id,
     stripe_subscription_id = subscription_id,
     subscription_status = 'active',
@@ -122,8 +122,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to downgrade from premium (on cancellation)
-CREATE OR REPLACE FUNCTION downgrade_from_premium(daycare_id INTEGER)
+-- Function to downgrade from Top Dog (on cancellation)
+CREATE OR REPLACE FUNCTION downgrade_from_top_dog(daycare_id INTEGER)
 RETURNS BOOLEAN AS $$
 BEGIN
   UPDATE dog_daycares
@@ -131,14 +131,14 @@ BEGIN
     tier = 'claimed', -- Downgrade to claimed, not unclaimed
     subscription_status = 'canceled',
     updated_at = NOW()
-  WHERE id = daycare_id AND tier = 'premium';
+  WHERE id = daycare_id AND tier = 'top_dog';
 
   RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
 
--- View for premium listings dashboard
-CREATE OR REPLACE VIEW premium_listings_summary AS
+-- View for Top Dog listings dashboard
+CREATE OR REPLACE VIEW top_dog_listings_summary AS
 SELECT
   id,
   name,
@@ -146,22 +146,22 @@ SELECT
   state,
   tier,
   claimed_at,
-  premium_since,
-  premium_until,
+  top_dog_since,
+  top_dog_until,
   subscription_status,
   stripe_customer_id,
   CASE
-    WHEN tier = 'premium' AND (premium_until IS NULL OR premium_until > NOW()) THEN 'Active'
-    WHEN tier = 'premium' AND premium_until <= NOW() THEN 'Expired'
+    WHEN tier = 'top_dog' AND (top_dog_until IS NULL OR top_dog_until > NOW()) THEN 'Active'
+    WHEN tier = 'top_dog' AND top_dog_until <= NOW() THEN 'Expired'
     WHEN tier = 'claimed' THEN 'Free Claimed'
     ELSE 'Unclaimed'
   END AS status_display,
   CASE
-    WHEN premium_until IS NULL THEN 'Monthly ($99/mo)'
+    WHEN top_dog_until IS NULL THEN 'Monthly ($99/mo)'
     ELSE 'Annual ($990/yr)'
   END AS plan_type
 FROM dog_daycares
-WHERE tier IN ('claimed', 'premium')
-ORDER BY tier DESC, premium_since DESC NULLS LAST;
+WHERE tier IN ('claimed', 'top_dog')
+ORDER BY tier DESC, top_dog_since DESC NULLS LAST;
 
-COMMENT ON VIEW premium_listings_summary IS 'Dashboard view of all claimed and premium listings';
+COMMENT ON VIEW top_dog_listings_summary IS 'Dashboard view of all claimed and Top Dog listings';

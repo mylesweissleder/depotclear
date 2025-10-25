@@ -307,16 +307,16 @@ function DaycareCard({ daycare }: { daycare: any }) {
   return (
     <Link href={`/listing/${daycare.id}`} className="block">
       <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 ${
-        tier === 'premium' ? 'border-yellow-400' : 'border-transparent hover:border-blue-600'
+        tier === 'top_dog' ? 'border-yellow-400' : 'border-transparent hover:border-blue-600'
       }`}>
         <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-bold text-lg text-gray-900">{daycare.name}</h3>
-              {tier === 'premium' && (
+              {tier === 'top_dog' && (
                 <span className="px-2 py-1 bg-yellow-400 text-gray-900 rounded-full font-black text-xs">
-                  ⭐ PREMIUM
+                  ⭐ TOP DOG
                 </span>
               )}
             </div>
