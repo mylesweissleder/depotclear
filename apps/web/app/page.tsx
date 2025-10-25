@@ -14,9 +14,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-3 rounded-2xl shadow-lg transform -rotate-12">
-                <Dog className="w-8 h-8 text-white transform rotate-12" />
-              </div>
+              <Image
+                src="/woofspotslogo.png"
+                alt="Woof Spots"
+                width={50}
+                height={50}
+                className="drop-shadow-lg"
+              />
               <div>
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">
                   Woof Spots
