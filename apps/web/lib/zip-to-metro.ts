@@ -44,8 +44,8 @@ const ZIP_TO_METRO_MAP: Record<string, { metro: string; region: string }> = {
   '926': { metro: 'irvine', region: 'socal' },
   '927': { metro: 'irvine', region: 'socal' },
 
-  // Santa Cruz (950)
-  '950': { metro: 'santa-cruz', region: 'california' },
+  // Santa Cruz (95062)
+  '95062': { metro: 'santa-cruz', region: 'california' },
 
   // San Luis Obispo (934)
   '934': { metro: 'san-luis-obispo', region: 'california' },
@@ -111,8 +111,8 @@ const ZIP_TO_METRO_MAP: Record<string, { metro: string; region: string }> = {
   '802': { metro: 'denver', region: 'mountain' },
   '803': { metro: 'denver', region: 'mountain' },
 
-  // Boulder (803)
-  '803': { metro: 'boulder', region: 'mountain' },
+  // Boulder (80302)
+  '80302': { metro: 'boulder', region: 'mountain' },
 
   // Salt Lake City (841-842)
   '841': { metro: 'salt-lake-city', region: 'mountain' },
