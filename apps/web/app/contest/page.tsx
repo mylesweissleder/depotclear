@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Camera, Trophy, Share2, Heart, AlertCircle, Upload, X } from 'lucide-react';
 import { useUploadThing } from '@/lib/uploadthing';
