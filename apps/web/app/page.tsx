@@ -17,9 +17,9 @@ export default function HomePage() {
               <Image
                 src="/woofspotslogo.png"
                 alt="Woof Spots"
-                width={80}
-                height={80}
-                className="drop-shadow-lg"
+                width={120}
+                height={120}
+                className="drop-shadow-lg animate-bounce"
               />
               <div>
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">

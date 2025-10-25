@@ -51,11 +51,11 @@ export default function AboutPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-black text-lg mb-4">
               <Heart className="w-6 h-6 fill-white" />
-              <span>In Loving Memory</span>
+              <span>The Inspiration</span>
             </div>
             <h2 className="text-4xl font-black mb-4">Pico & Twyla</h2>
             <p className="text-xl text-gray-700 italic">
-              The inspiration behind Woof Spots
+              The amazing pups behind Woof Spots
             </p>
           </div>
 
@@ -97,15 +97,16 @@ export default function AboutPage() {
           <div className="bg-white/50 rounded-2xl p-6 text-center">
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
               This project was inspired by two incredible dogs who brought immeasurable joy and love into
-              the lives of their family. Pico and Twyla were more than pets—they were family members,
+              the lives of their family. Pico and Twyla are more than pets—they are family members,
               best friends, and constant companions.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Their legacy lives on through Woof Spots, helping other dogs find the same quality care,
-              attention, and love that they received throughout their lives.
+              In loving memory of Pico, whose gentle spirit and enormous heart inspired us to create something
+              meaningful. Twyla continues to bring endless energy, love, and joy, reminding us every day why
+              quality care matters so much.
             </p>
             <p className="text-xl font-black text-purple-600">
-              Forever in our hearts. Forever inspiring us to help other pups thrive.
+              Pico forever in our hearts. Twyla forever inspiring us to help other pups thrive.
             </p>
           </div>
         </div>
