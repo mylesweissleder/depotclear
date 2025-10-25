@@ -28,7 +28,8 @@
     "react-dom": "^19.0.0",
     "resend": "^4.0.1",
     "stripe": "^19.1.0",
-    "uploadthing": "^7.7.4"
+    "uploadthing": "^7.7.4",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
