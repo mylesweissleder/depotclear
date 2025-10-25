@@ -15,7 +15,7 @@ interface Offer {
 
 async function getDaycareWithOffers(id: string) {
   try {
-    // Get daycare details
+    // Get daycare details including tier info
     const daycareResult = await sql`
       SELECT
         id,
@@ -32,7 +32,8 @@ async function getDaycareWithOffers(id: string) {
         description,
         business_hours as "businessHours",
         photos,
-        amenities
+        amenities,
+        tier
       FROM dog_daycares
       WHERE id = ${id}
     `;
@@ -77,6 +78,7 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
   }
 
   const { daycare, offers } = data;
+  const tier = daycare.tier || 'unclaimed'; // Default to unclaimed if not set
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,10 +94,24 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Business Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{daycare.name}</h1>
-          <p className="text-gray-600 mb-4">
-            {daycare.address}, {daycare.city}, {daycare.state} {daycare.zip}
-          </p>
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900">{daycare.name}</h1>
+            {tier === 'premium' && (
+              <span className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-full font-black text-sm shadow-lg">
+                ⭐ PREMIUM
+              </span>
+            )}
+          </div>
+          {/* Show full address only for claimed and premium */}
+          {tier !== 'unclaimed' ? (
+            <p className="text-gray-600 mb-4">
+              {daycare.address}, {daycare.city}, {daycare.state} {daycare.zip}
+            </p>
+          ) : (
+            <p className="text-gray-600 mb-4">
+              {daycare.city}, {daycare.state}
+            </p>
+          )}
 
           <div className="flex items-center space-x-4 mb-4">
             {daycare.rating && (
@@ -106,41 +122,59 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
             )}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {daycare.phone && (
-              <a
-                href={`tel:${daycare.phone}`}
-                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+          {/* Contact buttons - only show for claimed/premium */}
+          {tier !== 'unclaimed' && (
+            <div className="grid md:grid-cols-3 gap-4">
+              {daycare.phone && (
+                <a
+                  href={`tel:${daycare.phone}`}
+                  className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+                >
+                  📞 Call Now
+                </a>
+              )}
+              {daycare.website && (
+                <a
+                  href={daycare.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  🌐 Visit Website
+                </a>
+              )}
+              {daycare.email && (
+                <a
+                  href={`mailto:${daycare.email}`}
+                  className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  ✉️ Send Email
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Unclaimed CTA */}
+          {tier === 'unclaimed' && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+              <p className="text-gray-700 mb-3 font-medium">
+                📞 Want to see contact information?
+              </p>
+              <Link
+                href={`/claim?business=${encodeURIComponent(daycare.name)}&city=${encodeURIComponent(daycare.city)}&id=${daycare.id}`}
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700"
               >
-                📞 Call Now
-              </a>
-            )}
-            {daycare.website && (
-              <a
-                href={daycare.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                🌐 Visit Website
-              </a>
-            )}
-            {daycare.email && (
-              <a
-                href={`mailto:${daycare.email}`}
-                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                ✉️ Send Email
-              </a>
-            )}
-          </div>
+                Claim This Listing - FREE
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Active Offers */}
-            {offers.length > 0 && (
+            {/* Active Offers - Premium only */}
+            {tier === 'premium' && offers.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">🎁 Special Offers</h2>
                 <div className="space-y-4">
@@ -184,16 +218,16 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
-            {/* Description */}
-            {daycare.description && (
+            {/* Description - Premium only */}
+            {tier === 'premium' && daycare.description && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">About Us</h2>
                 <p className="text-gray-700 whitespace-pre-line">{daycare.description}</p>
               </div>
             )}
 
-            {/* Amenities */}
-            {daycare.amenities && Object.keys(daycare.amenities).length > 0 && (
+            {/* Amenities - Premium only */}
+            {tier === 'premium' && daycare.amenities && Object.keys(daycare.amenities).length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -209,8 +243,8 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
-            {/* Photos */}
-            {daycare.photos && daycare.photos.length > 0 && (
+            {/* Photos - Premium only */}
+            {tier === 'premium' && daycare.photos && daycare.photos.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Photos</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -229,52 +263,54 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Contact Card */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
-              <div className="space-y-3">
-                {daycare.phone && (
+            {/* Contact Card - only for claimed/premium */}
+            {tier !== 'unclaimed' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
+                <div className="space-y-3">
+                  {daycare.phone && (
+                    <div>
+                      <p className="text-sm text-gray-600">Phone</p>
+                      <a href={`tel:${daycare.phone}`} className="text-orange-600 hover:text-orange-700 font-medium">
+                        {daycare.phone}
+                      </a>
+                    </div>
+                  )}
+                  {daycare.email && (
+                    <div>
+                      <p className="text-sm text-gray-600">Email</p>
+                      <a href={`mailto:${daycare.email}`} className="text-orange-600 hover:text-orange-700 font-medium">
+                        {daycare.email}
+                      </a>
+                    </div>
+                  )}
+                  {daycare.website && (
+                    <div>
+                      <p className="text-sm text-gray-600">Website</p>
+                      <a
+                        href={daycare.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-orange-600 hover:text-orange-700 font-medium break-all"
+                      >
+                        Visit Website →
+                      </a>
+                    </div>
+                  )}
                   <div>
-                    <p className="text-sm text-gray-600">Phone</p>
-                    <a href={`tel:${daycare.phone}`} className="text-orange-600 hover:text-orange-700 font-medium">
-                      {daycare.phone}
-                    </a>
+                    <p className="text-sm text-gray-600">Address</p>
+                    <p className="text-gray-900">
+                      {daycare.address}
+                      <br />
+                      {daycare.city}, {daycare.state} {daycare.zip}
+                    </p>
                   </div>
-                )}
-                {daycare.email && (
-                  <div>
-                    <p className="text-sm text-gray-600">Email</p>
-                    <a href={`mailto:${daycare.email}`} className="text-orange-600 hover:text-orange-700 font-medium">
-                      {daycare.email}
-                    </a>
-                  </div>
-                )}
-                {daycare.website && (
-                  <div>
-                    <p className="text-sm text-gray-600">Website</p>
-                    <a
-                      href={daycare.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-orange-600 hover:text-orange-700 font-medium break-all"
-                    >
-                      Visit Website →
-                    </a>
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm text-gray-600">Address</p>
-                  <p className="text-gray-900">
-                    {daycare.address}
-                    <br />
-                    {daycare.city}, {daycare.state} {daycare.zip}
-                  </p>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Business Hours */}
-            {daycare.businessHours && (
+            {/* Business Hours - Premium only */}
+            {tier === 'premium' && daycare.businessHours && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Business Hours</h3>
                 <div className="space-y-2">
@@ -288,17 +324,32 @@ export default async function DaycarePage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
-            {/* CTA */}
-            <div className="bg-gradient-to-br from-orange-500 to-pink-500 rounded-lg p-6 text-white">
-              <h3 className="text-xl font-bold mb-2">Own this business?</h3>
-              <p className="mb-4">Claim your listing to manage your info and create special offers!</p>
-              <Link
-                href="/claim"
-                className="block w-full text-center px-4 py-2 bg-white text-orange-600 rounded-lg font-bold hover:bg-gray-100"
-              >
-                Claim This Listing
-              </Link>
-            </div>
+            {/* Tier-based CTA */}
+            {tier === 'unclaimed' && (
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg p-6 text-white">
+                <h3 className="text-xl font-bold mb-2">Is this your business?</h3>
+                <p className="mb-4">Claim your listing to add contact info and attract more customers!</p>
+                <Link
+                  href={`/claim?business=${encodeURIComponent(daycare.name)}&city=${encodeURIComponent(daycare.city)}&id=${daycare.id}`}
+                  className="block w-full text-center px-4 py-2 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100"
+                >
+                  Claim This Listing - FREE
+                </Link>
+              </div>
+            )}
+
+            {tier === 'claimed' && (
+              <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg p-6 text-white">
+                <h3 className="text-xl font-bold mb-2">Get 5x More Leads</h3>
+                <p className="mb-4">Upgrade to Premium for priority placement, photos, offers, and analytics!</p>
+                <Link
+                  href={`/pricing?id=${daycare.id}`}
+                  className="block w-full text-center px-4 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100"
+                >
+                  Upgrade to Premium - $99/mo
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

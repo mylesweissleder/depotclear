@@ -56,10 +56,10 @@ export default function ContestPage() {
   };
 
   // Submit vote
-  const handleVoteSubmit = async (e: React.FormEvent) => {
+  const handleVoteSubmit = async (e: React.FormEvent, voterZip: string) => {
     e.preventDefault();
 
-    if (!selectedEntry || !voterEmail) return;
+    if (!selectedEntry || !voterEmail || !voterZip) return;
 
     try {
       const res = await fetch('/api/contest/vote', {
@@ -68,6 +68,7 @@ export default function ContestPage() {
         body: JSON.stringify({
           submissionId: selectedEntry.id,
           voterEmail,
+          voterZip,
         }),
       });
 
@@ -83,8 +84,9 @@ export default function ContestPage() {
         // Mark as voted
         setVotedEntries(prev => new Set([...prev, selectedEntry.id]));
 
-        // Store email in localStorage
+        // Store email and zip in localStorage
         localStorage.setItem('voterEmail', voterEmail);
+        localStorage.setItem('voterZip', voterZip);
 
         alert(data.message);
         setShowVoteModal(false);
@@ -859,14 +861,21 @@ function SubmitPhotoModal({ onClose }: { onClose: () => void }) {
 
 // Vote Modal Component
 function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any) {
+  const [voterZip, setVoterZip] = React.useState('');
+
   if (!entry) return null;
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(e, voterZip);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-8 relative">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 relative my-8 max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
         >
           <X className="w-6 h-6" />
         </button>
@@ -895,7 +904,7 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
           </ul>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block font-bold mb-2">Your Email *</label>
             <input
@@ -906,10 +915,28 @@ function VoteModal({ entry, onClose, onSubmit, voterEmail, setVoterEmail }: any)
               className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
               placeholder="you@example.com"
             />
+          </div>
+
+          <div>
+            <label className="block font-bold mb-2">ZIP Code *</label>
+            <input
+              type="text"
+              required
+              value={voterZip}
+              onChange={(e) => setVoterZip(e.target.value)}
+              pattern="[0-9]{5}"
+              maxLength={5}
+              className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-purple-500 outline-none"
+              placeholder="94102"
+            />
             <p className="text-xs text-gray-500 mt-2">
-              🔒 By voting, you'll receive monthly newsletters featuring contest entries, winners, and featured content and updates from Woof Spots. No spam. Unsubscribe anytime.
+              📍 Get localized dog care recommendations in your area!
             </p>
           </div>
+
+          <p className="text-xs text-gray-500">
+            🔒 By voting, you'll receive weekly newsletters featuring contest entries, winners, and dog care recommendations in your metro area. No spam. Unsubscribe anytime.
+          </p>
 
           <button
             type="submit"

@@ -302,18 +302,30 @@ export default function SearchPage() {
 }
 
 function DaycareCard({ daycare }: { daycare: any }) {
+  const tier = daycare.tier || 'unclaimed';
+
   return (
     <Link href={`/listing/${daycare.id}`} className="block">
-      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 border-transparent hover:border-blue-600">
+      <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden border-2 ${
+        tier === 'premium' ? 'border-yellow-400' : 'border-transparent hover:border-blue-600'
+      }`}>
         <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <h3 className="font-bold text-lg mb-1 text-gray-900">{daycare.name}</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-lg text-gray-900">{daycare.name}</h3>
+              {tier === 'premium' && (
+                <span className="px-2 py-1 bg-yellow-400 text-gray-900 rounded-full font-black text-xs">
+                  ⭐ PREMIUM
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <MapPin className="w-4 h-4" />
               <span>{daycare.city}</span>
             </div>
-            {daycare.address && (
+            {/* Show full address only for claimed/premium */}
+            {tier !== 'unclaimed' && daycare.address && (
               <div className="text-xs text-gray-500 mt-1">{daycare.address}</div>
             )}
           </div>
@@ -349,29 +361,38 @@ function DaycareCard({ daycare }: { daycare: any }) {
           </div>
         )}
 
-        <div className="space-y-2 mb-4">
-          {daycare.phone && (
-            <div className="flex items-center text-sm text-gray-700">
-              <Phone className="w-4 h-4 text-blue-600 mr-2" />
-              <a href={`tel:${daycare.phone}`} className="hover:text-blue-600">
-                {daycare.phone}
-              </a>
-            </div>
-          )}
-          {daycare.website && (
-            <div className="flex items-center text-sm text-gray-700">
-              <Globe className="w-4 h-4 text-blue-600 mr-2" />
-              <a
-                href={daycare.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-blue-600 truncate"
-              >
-                Visit Website
-              </a>
-            </div>
-          )}
-        </div>
+        {/* Contact info - only show for claimed/premium */}
+        {tier !== 'unclaimed' ? (
+          <div className="space-y-2 mb-4">
+            {daycare.phone && (
+              <div className="flex items-center text-sm text-gray-700">
+                <Phone className="w-4 h-4 text-blue-600 mr-2" />
+                <a href={`tel:${daycare.phone}`} className="hover:text-blue-600">
+                  {daycare.phone}
+                </a>
+              </div>
+            )}
+            {daycare.website && (
+              <div className="flex items-center text-sm text-gray-700">
+                <Globe className="w-4 h-4 text-blue-600 mr-2" />
+                <a
+                  href={daycare.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-600 truncate"
+                >
+                  Visit Website
+                </a>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs text-gray-600 text-center">
+              📞 Contact info available after claiming
+            </p>
+          </div>
+        )}
 
         <div className="text-xs text-gray-400 italic text-center">
           Click to view full details

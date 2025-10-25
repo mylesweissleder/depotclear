@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { normalizeEmail, isDisposableEmail } from '@/lib/email-utils';
+import { zipToMetro } from '@/lib/zip-to-metro';
 
 /**
  * POST /api/contest/vote
@@ -15,11 +16,19 @@ import { normalizeEmail, isDisposableEmail } from '@/lib/email-utils';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { submissionId, voterEmail } = body;
+    const { submissionId, voterEmail, voterZip } = body;
 
     if (!submissionId || !voterEmail) {
       return NextResponse.json(
         { success: false, error: 'Missing submission ID or email' },
+        { status: 400 }
+      );
+    }
+
+    // Validate ZIP code format (5 digits)
+    if (voterZip && !/^\d{5}$/.test(voterZip)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid ZIP code format. Please enter 5 digits.' },
         { status: 400 }
       );
     }
@@ -82,12 +91,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Record the vote
+    // Record the vote with ZIP code
     await sql`
       INSERT INTO pup_votes
-      (submission_id, voter_email, ip_address, user_agent, vote_weight)
-      VALUES (${submissionId}, ${voterEmail}, ${ipAddress}, ${userAgent}, 1.0)
+      (submission_id, voter_email, voter_zip, ip_address, user_agent, vote_weight)
+      VALUES (${submissionId}, ${voterEmail}, ${voterZip || null}, ${ipAddress}, ${userAgent}, 1.0)
     `;
+
+    // Map ZIP code to metro area
+    // Users outside service areas get metro = null (generic newsletter)
+    const metroData = zipToMetro(voterZip);
+    const metro = metroData?.metro || null;
+    const region = metroData?.region || null;
 
     // Add email to newsletter (ignore if already exists)
     // This opts them into updates about contest winners and future contests
@@ -95,14 +110,22 @@ export async function POST(request: NextRequest) {
     try {
       const insertResult = await sql`
         INSERT INTO newsletter_subscribers
-        (email, normalized_email, source, ip_address, user_agent, subscribed)
-        VALUES (${voterEmail}, ${normalizedEmail}, 'contest_vote', ${ipAddress}, ${userAgent}, TRUE)
-        ON CONFLICT (email) DO NOTHING
+        (email, normalized_email, zip_code, metro, source, ip_address, user_agent, subscribed)
+        VALUES (${voterEmail}, ${normalizedEmail}, ${voterZip || null}, ${metro}, 'contest_vote', ${ipAddress}, ${userAgent}, TRUE)
+        ON CONFLICT (email) DO UPDATE
+        SET zip_code = COALESCE(EXCLUDED.zip_code, newsletter_subscribers.zip_code),
+            metro = COALESCE(EXCLUDED.metro, newsletter_subscribers.metro),
+            updated_at = CURRENT_TIMESTAMP
         RETURNING id
       `;
 
-      // If a row was returned, this is a new subscriber
+      // If a row was returned, this is a new subscriber or updated
       isNewSubscriber = insertResult.rows.length > 0;
+
+      // Log the metro mapping for debugging
+      if (isNewSubscriber && voterZip) {
+        console.log(`📍 Mapped ZIP ${voterZip} → ${metro || 'generic newsletter (outside service area)'}`);
+      }
     } catch (newsletterError) {
       // Don't fail the vote if newsletter insert fails
       console.error('Newsletter insert error (non-fatal):', newsletterError);

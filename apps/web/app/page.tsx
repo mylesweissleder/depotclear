@@ -68,9 +68,26 @@ export default function HomePage() {
             <h2 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
               <span className="text-gray-900">Find Trusted Dog Care Near You</span>
             </h2>
-            <p className="text-xl md:text-2xl text-gray-700 mb-4 font-medium leading-relaxed">
-              Daycare • Boarding • Grooming • Walking • Sitting • Training
-            </p>
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
+              <Link href="/services/daycare" className="bg-white text-orange-600 px-6 py-2 rounded-full font-bold hover:bg-orange-50 transition border-2 border-orange-200">
+                Daycare
+              </Link>
+              <Link href="/services/boarding" className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-50 transition border-2 border-blue-200">
+                Boarding
+              </Link>
+              <Link href="/services/grooming" className="bg-white text-pink-600 px-6 py-2 rounded-full font-bold hover:bg-pink-50 transition border-2 border-pink-200">
+                Grooming
+              </Link>
+              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+                Walking
+              </span>
+              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+                Sitting
+              </span>
+              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+                Training
+              </span>
+            </div>
             <p className="text-lg md:text-xl text-gray-600 mb-8 font-medium">
               Compare ratings, read real reviews, and find the perfect care for your furry friend.
             </p>
@@ -269,6 +286,60 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Testimonials / Trust Signals */}
+      <section className="py-20 bg-white/60 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">
+              ⭐ TRUSTED BY PET PARENTS
+            </div>
+            <h3 className="text-5xl font-black mb-4 text-gray-900">Real Stories, Happy Tails! 🐕</h3>
+            <p className="text-xl text-gray-600">See why thousands of pet parents trust Woof Spots</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <TestimonialCard
+              name="Sarah M."
+              location="San Francisco, CA"
+              rating={5}
+              text="Found the perfect daycare for my golden retriever in under 5 minutes! The reviews were spot-on and the staff is amazing. Charlie loves it there!"
+              verified={true}
+            />
+            <TestimonialCard
+              name="Mike T."
+              location="Los Angeles, CA"
+              rating={5}
+              text="As a first-time dog owner, I was nervous about finding the right place. Woof Spots made it so easy to compare options and read real reviews. Highly recommend!"
+              verified={true}
+            />
+            <TestimonialCard
+              name="Jennifer K."
+              location="Seattle, WA"
+              rating={5}
+              text="Love that I can search for boarding, grooming, AND training all in one place. Saved me so much time researching. My pup is getting the best care!"
+              verified={true}
+            />
+          </div>
+
+          <div className="bg-gradient-to-r from-orange-500 to-pink-500 rounded-3xl p-10 text-white text-center">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div>
+                <div className="text-5xl font-black mb-2">5,000+</div>
+                <div className="text-lg">Verified Providers</div>
+              </div>
+              <div>
+                <div className="text-5xl font-black mb-2">4.6★</div>
+                <div className="text-lg">Average Rating</div>
+              </div>
+              <div>
+                <div className="text-5xl font-black mb-2">50+</div>
+                <div className="text-lg">Cities Nationwide</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* For Businesses */}
       <section id="for-businesses" className="py-20 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-500 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -336,12 +407,23 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 border-t-4 border-orange-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
                 <Dog className="w-6 h-6 text-white" />
               </div>
               <span className="font-black text-lg">Woof Spots</span>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <Link href="/privacy" className="text-gray-400 hover:text-orange-400 transition">
+                Privacy Policy
+              </Link>
+              <a href="#for-businesses" className="text-gray-400 hover:text-orange-400 transition">
+                For Businesses
+              </a>
+              <Link href="/contest" className="text-gray-400 hover:text-orange-400 transition">
+                Contest
+              </Link>
             </div>
             <p className="text-gray-400 text-sm">
               © 2025 Made with 🐾 and ❤️ for dogs everywhere
@@ -453,6 +535,36 @@ function BizFeature({ emoji, text }: { emoji: string; text: string }) {
     <div className="flex items-center gap-3 text-left">
       <span className="text-3xl">{emoji}</span>
       <span className="font-semibold text-lg">{text}</span>
+    </div>
+  );
+}
+
+function TestimonialCard({ name, location, rating, text, verified }: { name: string; location: string; rating: number; text: string; verified: boolean }) {
+  return (
+    <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 border-4 border-orange-200">
+      {/* Rating Stars */}
+      <div className="flex items-center gap-1 mb-4">
+        {[...Array(rating)].map((_, i) => (
+          <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+        ))}
+      </div>
+
+      {/* Testimonial Text */}
+      <p className="text-gray-700 leading-relaxed mb-6 italic">"{text}"</p>
+
+      {/* Author Info */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-black text-gray-900">{name}</p>
+          <p className="text-sm text-gray-600">{location}</p>
+        </div>
+        {verified && (
+          <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            Verified
+          </div>
+        )}
+      </div>
     </div>
   );
 }

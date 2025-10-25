@@ -30,6 +30,7 @@ function ClaimListingContent() {
   const [results, setResults] = useState<Listing[]>([]);
   const [searching, setSearching] = useState(false);
   const [claiming, setClaiming] = useState<number | null>(null);
+  const [listingId, setListingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
     ownerName: '',
@@ -47,15 +48,19 @@ function ClaimListingContent() {
   useEffect(() => {
     const business = searchParams.get('business');
     const city = searchParams.get('city');
-    const listingId = searchParams.get('id');
+    const id = searchParams.get('id');
+
+    if (id) {
+      setListingId(id);
+    }
 
     if (business || city) {
       setFormData(prev => ({
         ...prev,
         businessName: business || prev.businessName,
         city: city || prev.city,
-        message: listingId
-          ? `I would like to claim listing #${listingId} for ${business}`
+        message: id
+          ? `I would like to claim listing #${id} for ${business}`
           : prev.message,
       }));
     }
@@ -67,10 +72,15 @@ function ClaimListingContent() {
     setError('');
 
     try {
+      const payload = {
+        ...formData,
+        ...(listingId && { listingId: parseInt(listingId) }),
+      };
+
       const res = await fetch('/api/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();

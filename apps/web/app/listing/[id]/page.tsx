@@ -11,7 +11,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  // Fetch daycare from database
+  // Fetch daycare from database including tier info
   const result = await sql`
     SELECT *
     FROM dog_daycares
@@ -23,6 +23,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   }
 
   const daycare = result.rows[0];
+  const tier = daycare.tier || 'unclaimed'; // Default to unclaimed if not set
 
   // Check if website is actually a Google Maps URL (data quality issue)
   const isWebsiteGoogleMaps = daycare.website && daycare.website.includes('google.com/maps');
@@ -45,12 +46,21 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-orange-400 to-pink-500 p-8 text-white">
-            <h1 className="text-4xl md:text-5xl font-black mb-4">{daycare.name}</h1>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h1 className="text-4xl md:text-5xl font-black">{daycare.name}</h1>
+              {tier === 'premium' && (
+                <div className="flex items-center gap-2 bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-black text-sm shadow-lg">
+                  <Award className="w-5 h-5" />
+                  PREMIUM
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2 text-lg mb-4">
               <MapPin className="w-5 h-5" />
               <span>{daycare.city}</span>
             </div>
-            {daycare.address && (
+            {/* Show full address only for claimed and premium tiers */}
+            {tier !== 'unclaimed' && daycare.address && (
               <p className="text-white/90">{daycare.address}</p>
             )}
           </div>
@@ -69,95 +79,133 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
-            {/* Contact Info */}
-            <div className="space-y-4 mb-8">
-              <h2 className="text-2xl font-black mb-4">Contact Information</h2>
-              {daycare.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-orange-500" />
-                  <a href={`tel:${daycare.phone}`} className="text-lg hover:text-orange-500">
-                    {daycare.phone}
-                  </a>
-                </div>
-              )}
-              {actualWebsite && (
-                <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-orange-500" />
-                  <a
-                    href={actualWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-lg hover:text-orange-500"
-                  >
-                    Visit Website
-                  </a>
-                </div>
-              )}
-            </div>
+            {/* Contact Info - Only show for claimed and premium tiers */}
+            {tier !== 'unclaimed' && (
+              <div className="space-y-4 mb-8">
+                <h2 className="text-2xl font-black mb-4">Contact Information</h2>
+                {daycare.phone && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-orange-500" />
+                    <a href={`tel:${daycare.phone}`} className="text-lg hover:text-orange-500">
+                      {daycare.phone}
+                    </a>
+                  </div>
+                )}
+                {actualWebsite && (
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-5 h-5 text-orange-500" />
+                    <a
+                      href={actualWebsite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg hover:text-orange-500"
+                    >
+                      Visit Website
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Attribution */}
             <div className="text-sm text-gray-500 italic mb-4 text-center">
               Rating and business information from Google Maps
             </div>
 
-            {/* Primary CTA - Business Website */}
-            {actualWebsite ? (
-              <div className="space-y-3">
-                <a
-                  href={actualWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
-                >
-                  Visit Official Website
-                  <ExternalLink className="inline-block w-5 h-5 ml-2" />
-                </a>
-                {daycare.google_maps_url && (
+            {/* Primary CTA - Only show for claimed/premium tiers */}
+            {tier !== 'unclaimed' && (
+              <>
+                {actualWebsite ? (
+                  <div className="space-y-3">
+                    <a
+                      href={actualWebsite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
+                    >
+                      Visit Official Website
+                      <ExternalLink className="inline-block w-5 h-5 ml-2" />
+                    </a>
+                    {daycare.google_maps_url && (
+                      <a
+                        href={daycare.google_maps_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block w-full bg-white border-2 border-orange-500 text-orange-500 text-center py-3 rounded-2xl font-bold text-base hover:bg-orange-50 transition"
+                      >
+                        View Reviews & Directions on Google Maps
+                        <ExternalLink className="inline-block w-4 h-4 ml-2" />
+                      </a>
+                    )}
+                  </div>
+                ) : daycare.google_maps_url ? (
                   <a
                     href={daycare.google_maps_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full bg-white border-2 border-orange-500 text-orange-500 text-center py-3 rounded-2xl font-bold text-base hover:bg-orange-50 transition"
+                    className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
                   >
-                    View Reviews & Directions on Google Maps
-                    <ExternalLink className="inline-block w-4 h-4 ml-2" />
+                    View Full Details & Reviews on Google Maps
+                    <ExternalLink className="inline-block w-5 h-5 ml-2" />
                   </a>
-                )}
-              </div>
-            ) : daycare.google_maps_url ? (
-              <a
-                href={daycare.google_maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-center py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
-              >
-                View Full Details & Reviews on Google Maps
-                <ExternalLink className="inline-block w-5 h-5 ml-2" />
-              </a>
-            ) : null}
+                ) : null}
+              </>
+            )}
 
-            {/* Claim This Listing */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
-                <div className="flex items-start gap-4">
-                  <Award className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
-                  <div className="flex-1">
-                    <h3 className="font-black text-xl text-gray-900 mb-2">
-                      Is this your business?
-                    </h3>
-                    <p className="text-gray-700 mb-4">
-                      Claim your free listing to update information, add photos, respond to reviews, and unlock premium features.
-                    </p>
-                    <Link
-                      href={`/claim?business=${encodeURIComponent(daycare.name)}&city=${encodeURIComponent(daycare.city)}&id=${id}`}
-                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg"
-                    >
-                      Claim This Listing
-                    </Link>
+            {/* Tier-Based CTAs */}
+            {tier === 'unclaimed' && (
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+                  <div className="flex items-start gap-4">
+                    <Award className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-black text-xl text-gray-900 mb-2">
+                        Is this your business?
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        Claim your free listing to add your website, phone number, and full address. Attract more customers!
+                      </p>
+                      <Link
+                        href={`/claim?business=${encodeURIComponent(daycare.name)}&city=${encodeURIComponent(daycare.city)}&id=${id}`}
+                        className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg"
+                      >
+                        Claim This Listing - FREE
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {tier === 'claimed' && (
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+                  <div className="flex items-start gap-4">
+                    <Award className="w-8 h-8 text-purple-600 flex-shrink-0 mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-black text-xl text-gray-900 mb-2">
+                        Get 5x More Leads with Premium
+                      </h3>
+                      <p className="text-gray-700 mb-3">
+                        Upgrade to Premium to appear first in search results, add photos, special offers, and get detailed analytics.
+                      </p>
+                      <ul className="text-gray-700 text-sm mb-4 space-y-1">
+                        <li>✅ Priority placement in search</li>
+                        <li>✅ Photo gallery & videos</li>
+                        <li>✅ Special offers & promotions</li>
+                        <li>✅ Enhanced analytics dashboard</li>
+                      </ul>
+                      <Link
+                        href={`/pricing?id=${id}`}
+                        className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-105"
+                      >
+                        Upgrade to Premium - $99/mo
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

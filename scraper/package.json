@@ -1,0 +1,17 @@
+{
+  "name": "woofspots-scraper",
+  "version": "1.0.0",
+  "description": "Google Maps scraper for dog daycare data",
+  "type": "module",
+  "scripts": {
+    "scrape": "node google-maps-scraper.js",
+    "scrape:all": "node google-maps-scraper.js --all"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}

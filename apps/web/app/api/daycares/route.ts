@@ -17,44 +17,72 @@ export async function GET(request: NextRequest) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, business_types, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at, tier
         FROM dog_daycares
         WHERE region = ${region}
           AND city = ${city}
           AND rating >= ${minRating}
-        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        ORDER BY
+          CASE tier
+            WHEN 'premium' THEN 1
+            WHEN 'claimed' THEN 2
+            ELSE 3
+          END,
+          rating DESC NULLS LAST,
+          review_count DESC NULLS LAST
         LIMIT ${limit}
       `;
     } else if (city !== 'All') {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, business_types, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at, tier
         FROM dog_daycares
         WHERE region = ${region}
           AND city = ${city}
-        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        ORDER BY
+          CASE tier
+            WHEN 'premium' THEN 1
+            WHEN 'claimed' THEN 2
+            ELSE 3
+          END,
+          rating DESC NULLS LAST,
+          review_count DESC NULLS LAST
         LIMIT ${limit}
       `;
     } else if (minRating > 0) {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, business_types, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at, tier
         FROM dog_daycares
         WHERE region = ${region}
           AND rating >= ${minRating}
-        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        ORDER BY
+          CASE tier
+            WHEN 'premium' THEN 1
+            WHEN 'claimed' THEN 2
+            ELSE 3
+          END,
+          rating DESC NULLS LAST,
+          review_count DESC NULLS LAST
         LIMIT ${limit}
       `;
     } else {
       result = await sql`
         SELECT
           id, name, rating, review_count, address, phone, website,
-          google_maps_url, price_level, city, region, business_types, scraped_at
+          google_maps_url, price_level, city, region, business_types, scraped_at, tier
         FROM dog_daycares
         WHERE region = ${region}
-        ORDER BY rating DESC NULLS LAST, review_count DESC NULLS LAST
+        ORDER BY
+          CASE tier
+            WHEN 'premium' THEN 1
+            WHEN 'claimed' THEN 2
+            ELSE 3
+          END,
+          rating DESC NULLS LAST,
+          review_count DESC NULLS LAST
         LIMIT ${limit}
       `;
     }

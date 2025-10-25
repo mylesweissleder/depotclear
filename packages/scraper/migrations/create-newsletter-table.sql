@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   normalized_email TEXT NOT NULL, -- For deduplication
   source TEXT DEFAULT 'contest_vote', -- Where they signed up (contest_vote, homepage, etc.)
 
+  -- Geographic segmentation
+  zip_code VARCHAR(5), -- ZIP code for metro mapping
+  metro VARCHAR(100), -- Derived metro area (e.g., 'san-francisco', 'new-york')
+
   -- Status
   subscribed BOOLEAN DEFAULT TRUE,
   confirmed BOOLEAN DEFAULT FALSE, -- For double opt-in (future)
@@ -25,6 +29,8 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
 CREATE INDEX IF NOT EXISTS idx_newsletter_normalized_email ON newsletter_subscribers(normalized_email);
 CREATE INDEX IF NOT EXISTS idx_newsletter_subscribed ON newsletter_subscribers(subscribed) WHERE subscribed = TRUE;
 CREATE INDEX IF NOT EXISTS idx_newsletter_source ON newsletter_subscribers(source);
+CREATE INDEX IF NOT EXISTS idx_newsletter_zip ON newsletter_subscribers(zip_code);
+CREATE INDEX IF NOT EXISTS idx_newsletter_metro ON newsletter_subscribers(metro);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_newsletter_updated_at()
