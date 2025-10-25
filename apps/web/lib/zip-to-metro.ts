@@ -17,8 +17,7 @@ const ZIP_TO_METRO_MAP: Record<string, { metro: string; region: string }> = {
   '950': { metro: 'san-jose', region: 'bay-area' },
   '951': { metro: 'san-jose', region: 'bay-area' },
 
-  // East Bay (945-946)
-  '945': { metro: 'walnut-creek', region: 'bay-area' },
+  // East Bay - Walnut Creek (946)
   '946': { metro: 'walnut-creek', region: 'bay-area' },
 
   // Los Angeles (900-908)
