@@ -32,12 +32,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Delete multiple daycares
-    const result = await sql`
-      DELETE FROM dog_daycares
-      WHERE id = ANY(${validIds})
-      RETURNING id
-    `;
+    // Delete multiple daycares using IN clause with dynamic placeholder
+    const placeholders = validIds.map((_, i) => `$${i + 1}`).join(', ');
+    const query = `DELETE FROM dog_daycares WHERE id IN (${placeholders}) RETURNING id`;
+    const result = await sql.query(query, validIds);
 
     return NextResponse.json({
       success: true,
