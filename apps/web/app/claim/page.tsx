@@ -134,34 +134,52 @@ function ClaimListingContent() {
           <h2 className="text-2xl font-black mb-6">What You'll Get (FREE!):</h2>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
             <div className="flex items-start gap-3">
-              <span className="text-3xl">📸</span>
-              <div>
-                <h3 className="font-bold">Full Profile</h3>
-                <p className="text-sm text-gray-600">Photos, description, amenities</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">⭐</span>
-              <div>
-                <h3 className="font-bold">Customer Reviews</h3>
-                <p className="text-sm text-gray-600">Build trust with ratings</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
               <span className="text-3xl">📞</span>
               <div>
                 <h3 className="font-bold">Direct Contact</h3>
-                <p className="text-sm text-gray-600">Phone, website, location</p>
+                <p className="text-sm text-gray-600">Phone & website link</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-3xl">🚀</span>
+              <span className="text-3xl">📍</span>
               <div>
-                <h3 className="font-bold">Priority Placement</h3>
-                <p className="text-sm text-gray-600">Featured on homepage</p>
+                <h3 className="font-bold">Basic Listing</h3>
+                <p className="text-sm text-gray-600">Name, address, location</p>
               </div>
             </div>
           </div>
+
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+            <h3 className="text-xl font-black mb-4 flex items-center gap-2">
+              <span>🏆</span>
+              <span>Want More? Upgrade to Top Dog!</span>
+            </h3>
+            <div className="grid md:grid-cols-2 gap-3 mb-4">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-600">✓</span>
+                <span>Photos & Full Description</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-600">✓</span>
+                <span>Customer Reviews & Ratings</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-600">✓</span>
+                <span>Priority Homepage Placement</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-600">✓</span>
+                <span>Featured in Newsletter</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700">
+              Claim your free listing first, then upgrade to Top Dog tier for premium features!
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+          <h2 className="text-2xl font-black mb-6">Claim Your Free Listing</h2>
 
           {success ? (
             <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8 text-center">

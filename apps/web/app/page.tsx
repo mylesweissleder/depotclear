@@ -17,8 +17,8 @@ export default function HomePage() {
               <Image
                 src="/woofspotslogo.png"
                 alt="Woof Spots"
-                width={50}
-                height={50}
+                width={80}
+                height={80}
                 className="drop-shadow-lg"
               />
               <div>
@@ -58,8 +58,8 @@ export default function HomePage() {
               <Image
                 src="/woofspotslogo.png"
                 alt="Woof Spots"
-                width={120}
-                height={120}
+                width={180}
+                height={180}
                 className="drop-shadow-2xl"
               />
             </div>
@@ -127,7 +127,7 @@ export default function HomePage() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-500 mt-3 text-center">
-                  Or <Link href="/search" className="text-orange-500 hover:underline font-semibold">browse all locations</Link>
+                  Or <Link href="/cities" className="text-orange-500 hover:underline font-semibold">browse all locations</Link>
                 </p>
               </form>
             </div>
@@ -413,12 +413,22 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
-                <Dog className="w-6 h-6 text-white" />
-              </div>
+              <Image
+                src="/woofspotslogo.png"
+                alt="Woof Spots"
+                width={50}
+                height={50}
+                className="drop-shadow-lg"
+              />
               <span className="font-black text-lg">Woof Spots</span>
             </div>
             <div className="flex gap-6 text-sm">
+              <Link href="/about" className="text-gray-400 hover:text-orange-400 transition">
+                About
+              </Link>
+              <Link href="/blog" className="text-gray-400 hover:text-orange-400 transition">
+                Blog
+              </Link>
               <Link href="/privacy" className="text-gray-400 hover:text-orange-400 transition">
                 Privacy Policy
               </Link>
