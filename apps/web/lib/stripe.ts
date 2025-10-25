@@ -12,22 +12,24 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   MONTHLY: {
-    name: 'Premium Monthly',
-    priceId: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID || 'price_1SLX6VCdC4FIQjaIo5aeRF5U',
+    name: 'Top Dog Monthly',
+    priceId: process.env.STRIPE_TOP_DOG_MONTHLY_PRICE_ID || process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID || 'price_1SLX6VCdC4FIQjaIo5aeRF5U',
     price: 99,
     interval: 'month',
     features: [
-      'Edit business information',
-      'Upload unlimited photos',
-      'Advanced analytics',
-      'Unlimited promotions',
-      'Priority listing placement',
-      'Enhanced visibility',
+      'Priority placement in search results',
+      'Photo gallery (up to 20 photos)',
+      'Special offers & promotions',
+      'Enhanced analytics dashboard',
+      'Contact form integration',
+      'Business hours editor',
+      'Custom business description',
+      'Premium badge',
     ],
   },
   ANNUAL: {
-    name: 'Premium Annual',
-    priceId: process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID || 'price_1SLX76CdC4FIQjaISizP0qg9',
+    name: 'Top Dog Annual',
+    priceId: process.env.STRIPE_TOP_DOG_ANNUAL_PRICE_ID || process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID || 'price_1SLX76CdC4FIQjaISizP0qg9',
     price: 990,
     interval: 'year',
     features: [

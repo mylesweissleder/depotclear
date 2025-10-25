@@ -8,25 +8,25 @@ import { Check, Sparkles } from 'lucide-react';
 
 const plans = {
   monthly: {
-    name: 'Premium Monthly',
+    name: 'Top Dog Monthly',
     price: 99,
     interval: 'month',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_MONTHLY_PRICE_ID || 'price_1SLX6VCdC4FIQjaIo5aeRF5U',
     features: [
-      'Edit business information',
-      'Upload unlimited photos',
-      'Advanced analytics',
-      'Unlimited promotions',
-      'Priority listing placement',
-      'Enhanced visibility',
+      'Priority placement in search results',
+      'Photo gallery (up to 20 photos)',
+      'Special offers & promotions',
+      'Enhanced analytics dashboard',
+      'Contact form integration',
+      'Business hours editor',
+      'Custom business description',
+      'Top Dog badge',
     ],
   },
   annual: {
-    name: 'Premium Annual',
+    name: 'Top Dog Annual',
     price: 990,
     interval: 'year',
     savings: 198,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_ANNUAL_PRICE_ID || 'price_1SLX76CdC4FIQjaISizP0qg9',
     features: [
       'Everything in Monthly',
       'Save $198/year (2 months free)',
@@ -42,9 +42,13 @@ export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const handleSubscribe = async (planType: 'monthly' | 'annual', businessId?: number) => {
-    if (!user) {
-      router.push('/login?redirect=/pricing');
+  const handleSubscribe = async (planType: 'monthly' | 'annual') => {
+    // Get daycareId from URL if present
+    const searchParams = new URLSearchParams(window.location.search);
+    const daycareId = searchParams.get('id');
+
+    if (!daycareId) {
+      setError('Please select a listing first. Go to your listing page and click "Become a Top Dog".');
       return;
     }
 
@@ -56,11 +60,10 @@ export default function PricingPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          priceId: plans[planType].priceId,
-          businessId,
+          daycareId: parseInt(daycareId),
+          plan: planType.toUpperCase(), // 'MONTHLY' or 'ANNUAL'
         }),
       });
 
@@ -129,13 +132,13 @@ export default function PricingPage() {
         <div className="text-center mb-12">
           <div className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold mb-6">
             <Sparkles className="inline-block w-4 h-4 mr-2" />
-            PREMIUM PLANS
+            TOP DOG PLANS
           </div>
           <h1 className="text-5xl md:text-6xl font-black mb-6">
-            Grow Your Dog Care Business
+            Become a Top Dog 🐕
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-            Get discovered by thousands of pet parents searching for the perfect daycare, grooming, or boarding services.
+            Get featured at the top of search results, attract more customers, and grow your business with premium tools built for success.
           </p>
         </div>
 
@@ -172,7 +175,7 @@ export default function PricingPage() {
               disabled={loading === 'monthly'}
               className="w-full py-4 px-6 bg-orange-500 text-white rounded-2xl font-bold text-lg hover:bg-orange-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
             >
-              {loading === 'monthly' ? 'Loading...' : 'Get Started'}
+              {loading === 'monthly' ? 'Loading...' : 'Become a Top Dog'}
             </button>
           </div>
 
@@ -213,7 +216,7 @@ export default function PricingPage() {
               disabled={loading === 'annual'}
               className="w-full py-4 px-6 bg-white text-orange-600 rounded-2xl font-bold text-lg hover:bg-yellow-50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-xl"
             >
-              {loading === 'annual' ? 'Loading...' : 'Get Started - Save $198'}
+              {loading === 'annual' ? 'Loading...' : 'Become a Top Dog - Save $198'}
             </button>
           </div>
         </div>

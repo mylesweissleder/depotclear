@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 import pkg from 'pg';
 const { Client } = pkg;
 import 'dotenv/config';
@@ -17,14 +17,16 @@ async function scrapeMarin() {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
 
-  const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized']
+  const browser = await chromium.launch({
+    headless: false
   });
 
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+    viewport: { width: 1920, height: 1080 }
+  });
+
+  const page = await context.newPage();
 
   let totalScraped = 0;
 
@@ -33,30 +35,32 @@ async function scrapeMarin() {
 
     // Search for dog daycares
     const searchUrl = `https://www.google.com/maps/search/dog+daycare+${encodeURIComponent(city)}`;
-    await page.goto(searchUrl, { waitUntil: 'networkidle2' });
-    await new Promise(r => setTimeout(r, 5000));
+    await page.goto(searchUrl, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(5000);
 
     // Scroll to load all results
-    const scrollContainer = await page.waitForSelector('div[role="feed"]');
+    const scrollContainer = await page.locator('div[role="feed"]').first();
+    await scrollContainer.waitFor();
+
     let previousHeight = 0;
-    let currentHeight = await page.evaluate(el => el.scrollHeight, scrollContainer);
+    let currentHeight = await scrollContainer.evaluate(el => el.scrollHeight);
 
     while (previousHeight !== currentHeight) {
-      await page.evaluate(el => el.scrollTo(0, el.scrollHeight), scrollContainer);
-      await new Promise(r => setTimeout(r, 3000));
+      await scrollContainer.evaluate(el => el.scrollTo(0, el.scrollHeight));
+      await page.waitForTimeout(3000);
       previousHeight = currentHeight;
-      currentHeight = await page.evaluate(el => el.scrollHeight, scrollContainer);
+      currentHeight = await scrollContainer.evaluate(el => el.scrollHeight);
     }
 
     // Get all business links
-    const businesses = await page.$$('a[href*="/maps/place/"]');
+    const businesses = await page.locator('a[href*="/maps/place/"]').all();
     console.log(`📍 Found ${businesses.length} businesses in ${city}`);
 
     for (let i = 0; i < businesses.length; i++) {
       try {
         // Click business to open details
         await businesses[i].click();
-        await new Promise(r => setTimeout(r, 3000));
+        await page.waitForTimeout(3000);
 
         // Extract data
         const data = await page.evaluate(() => {

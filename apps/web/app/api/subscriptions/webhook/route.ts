@@ -40,42 +40,60 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
 
         // Get subscription details
-        if (session.subscription && session.metadata) {
+        if (session.subscription && session.metadata?.daycareId) {
           const subscription: any = await stripe.subscriptions.retrieve(
             session.subscription as string
           );
 
-          // Create subscription record
+          const daycareId = parseInt(session.metadata.daycareId);
+          const isAnnual = session.metadata.plan === 'ANNUAL';
+
+          // Upgrade listing to Top Dog tier using database function
           await sql`
-            INSERT INTO subscriptions (
-              user_id,
-              daycare_id,
-              plan,
-              status,
-              stripe_customer_id,
-              stripe_subscription_id,
-              stripe_price_id,
-              current_period_start,
-              current_period_end,
-              created_at,
-              updated_at
-            )
-            VALUES (
-              ${parseInt(session.metadata.userId)},
-              ${parseInt(session.metadata.daycareId)},
-              ${session.metadata.plan},
-              'active',
+            SELECT upgrade_to_top_dog(
+              ${daycareId},
               ${session.customer as string},
               ${subscription.id},
-              ${subscription.items.data[0].price.id},
-              to_timestamp(${subscription.current_period_start}),
-              to_timestamp(${subscription.current_period_end}),
-              CURRENT_TIMESTAMP,
-              CURRENT_TIMESTAMP
+              ${isAnnual}
             )
           `;
 
-          console.log('Subscription created:', subscription.id);
+          console.log(`✅ Upgraded daycare ${daycareId} to Top Dog tier (subscription: ${subscription.id})`);
+
+          // Also create subscription record for tracking (if subscriptions table exists)
+          try {
+            await sql`
+              INSERT INTO subscriptions (
+                user_id,
+                daycare_id,
+                plan,
+                status,
+                stripe_customer_id,
+                stripe_subscription_id,
+                stripe_price_id,
+                current_period_start,
+                current_period_end,
+                created_at,
+                updated_at
+              )
+              VALUES (
+                ${session.metadata.userId ? parseInt(session.metadata.userId) : null},
+                ${daycareId},
+                ${session.metadata.plan},
+                'active',
+                ${session.customer as string},
+                ${subscription.id},
+                ${subscription.items.data[0].price.id},
+                to_timestamp(${subscription.current_period_start}),
+                to_timestamp(${subscription.current_period_end}),
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+            `;
+          } catch (e) {
+            // subscriptions table may not exist yet - that's ok, tier is already upgraded
+            console.log('Note: subscriptions table insert skipped (table may not exist)');
+          }
         }
         break;
       }
@@ -100,15 +118,36 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription: any = event.data.object;
 
-        // Mark subscription as cancelled
-        await sql`
-          UPDATE subscriptions
-          SET status = 'cancelled',
-              updated_at = CURRENT_TIMESTAMP
+        // Find the daycare and downgrade from Top Dog tier
+        const daycareResult = await sql`
+          SELECT id
+          FROM dog_daycares
           WHERE stripe_subscription_id = ${subscription.id}
         `;
 
-        console.log('Subscription cancelled:', subscription.id);
+        if (daycareResult.rows.length > 0) {
+          const daycareId = daycareResult.rows[0].id;
+
+          // Downgrade from Top Dog tier using database function
+          await sql`
+            SELECT downgrade_from_top_dog(${daycareId})
+          `;
+
+          console.log(`⬇️ Downgraded daycare ${daycareId} from Top Dog tier (subscription cancelled: ${subscription.id})`);
+        }
+
+        // Also update subscriptions table if it exists
+        try {
+          await sql`
+            UPDATE subscriptions
+            SET status = 'cancelled',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE stripe_subscription_id = ${subscription.id}
+          `;
+        } catch (e) {
+          console.log('Note: subscriptions table update skipped (table may not exist)');
+        }
+
         break;
       }
 

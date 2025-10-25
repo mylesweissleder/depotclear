@@ -1,25 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticate } from '@/lib/auth-middleware';
 import { stripe, SUBSCRIPTION_PLANS, PlanType } from '@/lib/stripe';
 import { sql } from '@vercel/postgres';
 
 /**
- * Create a Stripe checkout session for subscription
- * Requires authentication and approved claim
+ * Create a Stripe checkout session for Top Dog subscription
+ * Simplified - allows any claimed listing to upgrade
  */
 export async function POST(request: NextRequest) {
   try {
-    const auth = await authenticate(request);
-
-    if (!auth.authenticated) {
-      return NextResponse.json(
-        { success: false, error: auth.error || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
-    const { daycareId, plan } = body;
+    const { daycareId, plan, email } = body;
 
     // Validation
     if (!daycareId || !plan) {
@@ -36,36 +26,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify user owns this business
-    const claimCheck = await sql`
-      SELECT bc.id, d.name
-      FROM business_claims bc
-      JOIN dog_daycares d ON bc.daycare_id = d.id
-      WHERE bc.daycare_id = ${daycareId}
-        AND bc.user_id = ${auth.user!.id}
-        AND bc.status = 'approved'
+    // Verify listing exists and get details
+    const daycareResult = await sql`
+      SELECT id, name, tier, claimed_by_email, stripe_subscription_id
+      FROM dog_daycares
+      WHERE id = ${daycareId}
     `;
 
-    if (claimCheck.rows.length === 0) {
+    if (daycareResult.rows.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'You do not have permission to subscribe for this business' },
-        { status: 403 }
+        { success: false, error: 'Listing not found' },
+        { status: 404 }
       );
     }
 
-    const daycare = claimCheck.rows[0];
+    const daycare = daycareResult.rows[0];
 
-    // Check if business already has an active subscription
-    const existingSub = await sql`
-      SELECT id
-      FROM subscriptions
-      WHERE daycare_id = ${daycareId}
-        AND status = 'active'
-    `;
-
-    if (existingSub.rows.length > 0) {
+    // Verify listing is claimed (unclaimed listings can't upgrade directly)
+    if (daycare.tier === 'unclaimed') {
       return NextResponse.json(
-        { success: false, error: 'This business already has an active subscription' },
+        { success: false, error: 'Please claim this listing first before upgrading to Top Dog' },
+        { status: 400 }
+      );
+    }
+
+    // Check if already Top Dog
+    if (daycare.tier === 'top_dog' && daycare.stripe_subscription_id) {
+      return NextResponse.json(
+        { success: false, error: 'This listing already has an active Top Dog subscription' },
         { status: 400 }
       );
     }
@@ -75,28 +63,29 @@ export async function POST(request: NextRequest) {
     // Create or retrieve Stripe customer
     let stripeCustomerId: string;
 
-    const existingCustomer = await sql`
-      SELECT stripe_customer_id
-      FROM subscriptions
-      WHERE daycare_id = ${daycareId}
-        AND stripe_customer_id IS NOT NULL
-      LIMIT 1
-    `;
-
-    if (existingCustomer.rows.length > 0 && existingCustomer.rows[0].stripe_customer_id) {
-      stripeCustomerId = existingCustomer.rows[0].stripe_customer_id;
+    if (daycare.stripe_customer_id) {
+      // Use existing customer ID from daycare record
+      stripeCustomerId = daycare.stripe_customer_id;
     } else {
       // Create new Stripe customer
+      const customerEmail = email || daycare.claimed_by_email || `listing-${daycareId}@woofspots.com`;
+
       const customer = await stripe.customers.create({
-        email: auth.user!.email,
-        name: auth.user!.name || undefined,
+        email: customerEmail,
+        name: daycare.name,
         metadata: {
-          userId: auth.user!.id.toString(),
           daycareId: daycareId.toString(),
           daycareNa: daycare.name,
         },
       });
       stripeCustomerId = customer.id;
+
+      // Save customer ID to daycare record
+      await sql`
+        UPDATE dog_daycares
+        SET stripe_customer_id = ${stripeCustomerId}
+        WHERE id = ${daycareId}
+      `;
     }
 
     // Create Stripe checkout session
@@ -110,10 +99,9 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/businesses/${daycareId}?subscription=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/businesses/${daycareId}?subscription=cancelled`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://woofspots.com'}/listing/${daycareId}?upgrade=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://woofspots.com'}/listing/${daycareId}?upgrade=cancelled`,
       metadata: {
-        userId: auth.user!.id.toString(),
         daycareId: daycareId.toString(),
         plan: plan,
       },
