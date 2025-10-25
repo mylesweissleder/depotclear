@@ -3,8 +3,8 @@ import pkg from 'pg';
 const { Client } = pkg;
 import 'dotenv/config';
 
-const NORTH_BAY_CITIES = [
-  // Marin County
+const CITIES_TO_SCRAPE = [
+  // Marin County, CA
   'Novato, CA',
   'San Rafael, CA',
   'Mill Valley, CA',
@@ -13,7 +13,7 @@ const NORTH_BAY_CITIES = [
   'Sausalito, CA',
   'Tiburon, CA',
 
-  // Sonoma County
+  // Sonoma County, CA
   'Santa Rosa, CA',
   'Petaluma, CA',
   'Rohnert Park, CA',
@@ -21,6 +21,36 @@ const NORTH_BAY_CITIES = [
   'Healdsburg, CA',
   'Windsor, CA',
   'Sebastopol, CA',
+
+  // Colorado
+  'Denver, CO',
+  'Boulder, CO',
+  'Erie, CO',
+  'Estes Park, CO',
+
+  // Florida
+  'Sarasota, FL',
+
+  // Westchester County, NY
+  'Chappaqua, NY',
+  'Mount Kisco, NY',
+  'Bedford, NY',
+  'Bedford Hills, NY',
+  'Katonah, NY',
+  'Lewisboro, NY',
+  'South Salem, NY',
+  'Brewster, NY',
+  'White Plains, NY',
+  'Rye, NY',
+  'Hastings-on-Hudson, NY',
+  'Ossining, NY',
+  'Pleasantville, NY',
+  'Thornwood, NY',
+  'Hawthorne, NY',
+  'Yonkers, NY',
+  'New Rochelle, NY',
+  'Mount Vernon, NY',
+  'Scarsdale, NY'
 ];
 
 async function scrapeMarin() {
@@ -40,7 +70,7 @@ async function scrapeMarin() {
 
   let totalScraped = 0;
 
-  for (const city of NORTH_BAY_CITIES) {
+  for (const city of CITIES_TO_SCRAPE) {
     console.log(`\n🔍 Searching: ${city}`);
 
     // Search for dog daycares
@@ -125,11 +155,11 @@ async function scrapeMarin() {
         // Insert into database
         await client.query(`
           INSERT INTO dog_daycares (
-            name, address, city, state, metro, phone, website,
+            name, address, city, state, phone, website,
             rating, review_count, latitude, longitude, place_id,
-            data_source, created_at, updated_at
+            created_at, updated_at
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
           ON CONFLICT (place_id) DO UPDATE
           SET
             name = EXCLUDED.name,
@@ -143,15 +173,13 @@ async function scrapeMarin() {
           data.address,
           cityName,
           state,
-          metro,
           data.phone,
           data.website,
           data.rating,
           data.reviewCount,
           data.latitude,
           data.longitude,
-          data.placeId,
-          'google_maps'
+          data.placeId
         ]);
 
         totalScraped++;
@@ -165,7 +193,7 @@ async function scrapeMarin() {
   await browser.close();
   await client.end();
 
-  console.log(`\n✅ Scraping complete! Total: ${totalScraped} businesses from Marin & Sonoma Counties`);
+  console.log(`\n✅ Scraping complete! Total: ${totalScraped} businesses across all cities`);
 }
 
 scrapeMarin().catch(console.error);
