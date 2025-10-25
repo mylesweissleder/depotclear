@@ -3,7 +3,8 @@ import pkg from 'pg';
 const { Client } = pkg;
 import 'dotenv/config';
 
-const MARIN_CITIES = [
+const NORTH_BAY_CITIES = [
+  // Marin County
   'Novato, CA',
   'San Rafael, CA',
   'Mill Valley, CA',
@@ -11,6 +12,15 @@ const MARIN_CITIES = [
   'Larkspur, CA',
   'Sausalito, CA',
   'Tiburon, CA',
+
+  // Sonoma County
+  'Santa Rosa, CA',
+  'Petaluma, CA',
+  'Rohnert Park, CA',
+  'Sonoma, CA',
+  'Healdsburg, CA',
+  'Windsor, CA',
+  'Sebastopol, CA',
 ];
 
 async function scrapeMarin() {
@@ -30,12 +40,12 @@ async function scrapeMarin() {
 
   let totalScraped = 0;
 
-  for (const city of MARIN_CITIES) {
+  for (const city of NORTH_BAY_CITIES) {
     console.log(`\n🔍 Searching: ${city}`);
 
     // Search for dog daycares
     const searchUrl = `https://www.google.com/maps/search/dog+daycare+${encodeURIComponent(city)}`;
-    await page.goto(searchUrl, { waitUntil: 'networkidle' });
+    await page.goto(searchUrl, { timeout: 60000 });
     await page.waitForTimeout(5000);
 
     // Scroll to load all results
@@ -155,7 +165,7 @@ async function scrapeMarin() {
   await browser.close();
   await client.end();
 
-  console.log(`\n✅ Scraping complete! Total: ${totalScraped} businesses from Marin County`);
+  console.log(`\n✅ Scraping complete! Total: ${totalScraped} businesses from Marin & Sonoma Counties`);
 }
 
 scrapeMarin().catch(console.error);

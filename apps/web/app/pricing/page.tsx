@@ -229,9 +229,9 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="text-4xl mb-4">📸</div>
-              <h3 className="text-xl font-bold mb-2">Unlimited Photos</h3>
+              <h3 className="text-xl font-bold mb-2">Photo Gallery</h3>
               <p className="text-gray-600">
-                Showcase your facility, staff, and happy pups with unlimited photo uploads
+                Showcase your facility, staff, and happy pups with up to 20 custom photos
               </p>
             </div>
 

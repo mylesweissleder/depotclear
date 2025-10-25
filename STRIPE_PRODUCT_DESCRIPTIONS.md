@@ -5,7 +5,7 @@
 **Product Name:** Top Dog Monthly
 
 **Description:**
-Become the alpha of local search! Top Dog listings appear first in search results with a premium badge, attracting 5x more customer clicks. Upload unlimited photos to showcase your facility, track detailed analytics to optimize your marketing, and get priority support when you need it. Perfect for dog daycare businesses ready to dominate their local market.
+Become the alpha of local search! Top Dog listings appear first in search results with a premium badge, attracting 5x more customer clicks. Upload up to 20 photos to showcase your facility, track detailed analytics to optimize your marketing, and get priority support when you need it. Perfect for dog daycare businesses ready to dominate their local market.
 
 **Statement Descriptor:** WOOFSPOTS TOP DOG
 
@@ -13,7 +13,7 @@ Become the alpha of local search! Top Dog listings appear first in search result
 - tier: top_dog
 - interval: monthly
 - price: 99
-- features: priority_placement,premium_badge,unlimited_photos,analytics,priority_support
+- features: priority_placement,premium_badge,20_photos,analytics,priority_support
 
 ---
 
@@ -22,7 +22,7 @@ Become the alpha of local search! Top Dog listings appear first in search result
 **Product Name:** Top Dog Annual
 
 **Description:**
-Save $198/year (17% off) with our annual Top Dog plan! Get featured placement at the top of search results, premium badge, unlimited photos, detailed analytics, and priority support. Plus, lock in your rate and never worry about monthly billing. Best value for serious dog daycare businesses committed to long-term growth and market domination.
+Save $198/year (17% off) with our annual Top Dog plan! Get featured placement at the top of search results, premium badge, up to 20 photos, detailed analytics, and priority support. Plus, lock in your rate and never worry about monthly billing. Best value for serious dog daycare businesses committed to long-term growth and market domination.
 
 **Statement Descriptor:** WOOFSPOTS TOP DOG
 
@@ -31,7 +31,7 @@ Save $198/year (17% off) with our annual Top Dog plan! Get featured placement at
 - interval: annual
 - price: 990
 - savings: 198
-- features: priority_placement,premium_badge,unlimited_photos,analytics,priority_support,annual_savings
+- features: priority_placement,premium_badge,20_photos,analytics,priority_support,annual_savings
 
 ---
 
@@ -40,7 +40,7 @@ Save $198/year (17% off) with our annual Top Dog plan! Get featured placement at
 ### Why Top Dog?
 - **Priority Placement:** Appear first in search results when pet parents look for daycare
 - **Premium Badge:** Stand out with the "⭐ TOP DOG" badge that signals quality and trust
-- **Unlimited Photos:** Showcase your facility, happy dogs, and team to build confidence
+- **Photo Gallery (up to 20 photos):** Showcase your facility, happy dogs, and team to build confidence
 - **Detailed Analytics:** Track views, clicks, and conversions to optimize your marketing
 - **Priority Support:** Get fast responses when you need help
 
@@ -57,7 +57,7 @@ Save $198/year (17% off) with our annual Top Dog plan! Get featured placement at
 
 ## Short Descriptions (for Stripe Dashboard)
 
-**Monthly:** $99/mo - Priority search placement, premium badge, unlimited photos, analytics & support
+**Monthly:** $99/mo - Priority search placement, premium badge, 20 photos, analytics & support
 
 **Annual:** $990/yr (save $198!) - All Top Dog benefits with 2 months free. Best value for growth-focused daycares.
 
@@ -113,7 +113,7 @@ Ready to dominate local search?
 **Both plans include:**
 - Priority search placement
 - Premium "Top Dog" badge
-- Unlimited photo uploads
+- Photo gallery (up to 20 photos)
 - Detailed analytics dashboard
 - Priority customer support
 - 24/7 access to your listing dashboard
