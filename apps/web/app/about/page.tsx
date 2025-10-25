@@ -151,7 +151,7 @@ export default function AboutPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 border-t-4 border-orange-500 mt-16">
+      <footer className="bg-gray-700 text-white py-12 border-t-4 border-orange-500 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center space-x-3">

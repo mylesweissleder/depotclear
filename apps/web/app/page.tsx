@@ -17,9 +17,9 @@ export default function HomePage() {
               <Image
                 src="/woofspotslogo.png"
                 alt="Woof Spots"
-                width={120}
-                height={120}
-                className="drop-shadow-lg animate-bounce"
+                width={80}
+                height={80}
+                className="drop-shadow-lg"
               />
               <div>
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight">
@@ -58,9 +58,9 @@ export default function HomePage() {
               <Image
                 src="/woofspotslogo.png"
                 alt="Woof Spots"
-                width={180}
-                height={180}
-                className="drop-shadow-2xl"
+                width={240}
+                height={240}
+                className="drop-shadow-2xl animate-bounce"
               />
             </div>
 
@@ -82,13 +82,13 @@ export default function HomePage() {
               <Link href="/services/grooming" className="bg-white text-pink-600 px-6 py-2 rounded-full font-bold hover:bg-pink-50 transition border-2 border-pink-200">
                 Grooming
               </Link>
-              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+              <span className="bg-white text-gray-400 px-6 py-2 rounded-full font-bold border-2 border-gray-200 cursor-not-allowed opacity-60">
                 Walking
               </span>
-              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+              <span className="bg-white text-gray-400 px-6 py-2 rounded-full font-bold border-2 border-gray-200 cursor-not-allowed opacity-60">
                 Sitting
               </span>
-              <span className="bg-white text-gray-600 px-6 py-2 rounded-full font-bold border-2 border-gray-200">
+              <span className="bg-white text-gray-400 px-6 py-2 rounded-full font-bold border-2 border-gray-200 cursor-not-allowed opacity-60">
                 Training
               </span>
             </div>
@@ -409,7 +409,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 border-t-4 border-orange-500">
+      <footer className="bg-gray-700 text-white py-12 border-t-4 border-orange-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center space-x-3">

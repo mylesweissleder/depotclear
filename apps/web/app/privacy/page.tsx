@@ -125,7 +125,7 @@ export default function PrivacyPage() {
               We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last Updated" date.
             </p>
             <p className="text-gray-700 mt-3">
-              <strong>Last Updated:</strong> January 2025
+              <strong>Last Updated:</strong> October 2025
             </p>
           </section>
 
